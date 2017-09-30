@@ -15,4 +15,5 @@ final class ImageStore
       defaultImages = new LinkedList<>();
       defaultImages.add(defaultImage);
    }
+
 }

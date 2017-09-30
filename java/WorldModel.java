@@ -51,4 +51,43 @@ final class WorldModel
    {
       return this.occupancy[pos.y][pos.x];
    }
+
+   public Background getBackgroundCell(Point pos)
+   {
+      return this.background[pos.y][pos.x];
+   }
+
+    public void setBackgroundCell(Point pos, Background background)
+    {
+        this.background[pos.y][pos.x] = background;
+    }
+
+    public void setBackground(Point pos, Background background)
+    {
+        if (this.withinBounds(pos))
+        {
+            this.setBackgroundCell(pos, background);
+        }
+    }
+
+    public void setOccupancyCell(Point pos, Entity entity)
+    {
+        this.occupancy[pos.y][pos.x] = entity;
+    }
+
+    public void removeEntityAt(Point pos)
+    {
+        if (this.withinBounds(pos)
+                && this.getOccupancyCell(pos) != null)
+        {
+            Entity entity = this.getOccupancyCell(pos);
+
+         /* this moves the entity just outside of the grid for
+            debugging purposes */
+            entity.position = new Point(-1, -1);
+            this.entities.remove(entity);
+            this.setOccupancyCell(pos, null);
+        }
+    }
 }
+

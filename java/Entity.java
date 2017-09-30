@@ -74,5 +74,31 @@ final class Entity
 
         return newPos;
     }
+    public  void nextImage()
+    {
+        this.imageIndex = (this.imageIndex + 1) % this.images.size();
+    }
+
+    public int getAnimationPeriod()
+    {
+        switch (this.kind)
+        {
+            case MINER_FULL:
+            case MINER_NOT_FULL:
+            case ORE_BLOB:
+            case QUAKE:
+                return this.animationPeriod;
+            default:
+                throw new UnsupportedOperationException(
+                        String.format("getAnimationPeriod not supported for %s",
+                                this.kind));
+        }
+    }
+    public void removeEntity(WorldModel world)
+    {
+        world.removeEntityAt(this.position);
+    }
+
+
 
 }

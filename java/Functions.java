@@ -97,98 +97,6 @@ final class Functions
       }
    }
 
-   public static void executeAction(Action action, EventScheduler scheduler)
-   {
-      switch (action.kind)
-      {
-         case ACTIVITY:
-            executeActivityAction(action, scheduler);
-            break;
-
-         case ANIMATION:
-            executeAnimationAction(action, scheduler);
-            break;
-      }
-   }
-
-   public static int getAnimationPeriod(Entity entity)
-   {
-      switch (entity.kind)
-      {
-      case MINER_FULL:
-      case MINER_NOT_FULL:
-      case ORE_BLOB:
-      case QUAKE:
-         return entity.animationPeriod;
-      default:
-         throw new UnsupportedOperationException(
-            String.format("getAnimationPeriod not supported for %s",
-            entity.kind));
-      }
-   }
-
-   public static void nextImage(Entity entity)
-   {
-      entity.imageIndex = (entity.imageIndex + 1) % entity.images.size();
-   }
-
-
-   public static void executeAnimationAction(Action action,
-      EventScheduler scheduler)
-   {
-      nextImage(action.entity);
-
-      if (action.repeatCount != 1)
-      {
-         scheduleEvent(scheduler, action.entity,
-            createAnimationAction(action.entity,
-               Math.max(action.repeatCount - 1, 0)),
-            getAnimationPeriod(action.entity));
-      }
-   }
-
-   public static void executeActivityAction(Action action,
-      EventScheduler scheduler)
-   {
-      switch (action.entity.kind)
-      {
-      case MINER_FULL:
-         executeMinerFullActivity(action.entity, action.world,
-            action.imageStore, scheduler);
-         break;
-
-      case MINER_NOT_FULL:
-         executeMinerNotFullActivity(action.entity, action.world,
-            action.imageStore, scheduler);
-         break;
-
-      case ORE:
-         executeOreActivity(action.entity, action.world, action.imageStore,
-            scheduler);
-         break;
-
-      case ORE_BLOB:
-         executeOreBlobActivity(action.entity, action.world,
-            action.imageStore, scheduler);
-         break;
-
-      case QUAKE:
-         executeQuakeActivity(action.entity, action.world, action.imageStore,
-            scheduler);
-         break;
-
-      case VEIN:
-         executeVeinActivity(action.entity, action.world, action.imageStore,
-            scheduler);
-         break;
-
-      default:
-         throw new UnsupportedOperationException(
-            String.format("executeActivityAction not supported for %s",
-            action.entity.kind));
-      }
-   }
-
    public static void executeMinerFullActivity(Entity entity, WorldModel world,
       ImageStore imageStore, EventScheduler scheduler)
    {
@@ -229,7 +137,7 @@ final class Functions
    {
       Point pos = entity.position;  // store current position before removing
 
-      removeEntity(world, entity);
+      entity.removeEntity(world);
       unscheduleAllEvents(scheduler, entity);
 
       Entity blob = createOreBlob(entity.id + BLOB_ID_SUFFIX,
@@ -273,7 +181,7 @@ final class Functions
       ImageStore imageStore, EventScheduler scheduler)
    {
       unscheduleAllEvents(scheduler, entity);
-      removeEntity(world, entity);
+      entity.removeEntity(world);
    }
 
    public static void executeVeinActivity(Entity entity, WorldModel world,
@@ -306,7 +214,7 @@ final class Functions
             createActivityAction(entity, world, imageStore),
             entity.actionPeriod);
          scheduleEvent(scheduler, entity, createAnimationAction(entity, 0),
-            getAnimationPeriod(entity));
+            entity.getAnimationPeriod());
          break;
 
       case MINER_NOT_FULL:
@@ -314,7 +222,7 @@ final class Functions
             createActivityAction(entity, world, imageStore),
             entity.actionPeriod);
          scheduleEvent(scheduler, entity,
-            createAnimationAction(entity, 0), getAnimationPeriod(entity));
+            createAnimationAction(entity, 0), entity.getAnimationPeriod());
          break;
 
       case ORE:
@@ -328,7 +236,7 @@ final class Functions
             createActivityAction(entity, world, imageStore),
             entity.actionPeriod);
          scheduleEvent(scheduler, entity,
-            createAnimationAction(entity, 0), getAnimationPeriod(entity));
+            createAnimationAction(entity, 0), entity.getAnimationPeriod());
          break;
 
       case QUAKE:
@@ -337,7 +245,7 @@ final class Functions
             entity.actionPeriod);
          scheduleEvent(scheduler, entity,
             createAnimationAction(entity, QUAKE_ANIMATION_REPEAT_COUNT),
-            getAnimationPeriod(entity));
+            entity.getAnimationPeriod());
          break;
 
       case VEIN:
@@ -359,7 +267,7 @@ final class Functions
             entity.position, entity.actionPeriod, entity.animationPeriod,
             entity.images);
 
-         removeEntity(world, entity);
+         entity.removeEntity(world);
          unscheduleAllEvents(scheduler, entity);
 
          addEntity(world, miner);
@@ -378,7 +286,7 @@ final class Functions
          entity.position, entity.actionPeriod, entity.animationPeriod,
          entity.images);
 
-      removeEntity(world, entity);
+      entity.removeEntity(world);
       unscheduleAllEvents(scheduler, entity);
 
       addEntity(world, miner);
@@ -388,10 +296,10 @@ final class Functions
    public static boolean moveToNotFull(Entity miner, WorldModel world,
       Entity target, EventScheduler scheduler)
    {
-      if (adjacent(miner.position, target.position))
+      if (miner.position.adjacent(target.position))
       {
          miner.resourceCount += 1;
-         removeEntity(world, target);
+         target.removeEntity(world);
          unscheduleAllEvents(scheduler, target);
 
          return true;
@@ -417,7 +325,7 @@ final class Functions
    public static boolean moveToFull(Entity miner, WorldModel world,
       Entity target, EventScheduler scheduler)
    {
-      if (adjacent(miner.position, target.position))
+      if (miner.position.adjacent(target.position))
       {
          return true;
       }
@@ -442,9 +350,9 @@ final class Functions
    public static boolean moveToOreBlob(Entity blob, WorldModel world,
       Entity target, EventScheduler scheduler)
    {
-      if (adjacent(blob.position, target.position))
+      if (blob.position.adjacent(target.position))
       {
-         removeEntity(world, target);
+         target.removeEntity(world);
          unscheduleAllEvents(scheduler, target);
          return true;
       }
@@ -466,11 +374,6 @@ final class Functions
       }
    }
 
-   public static boolean adjacent(Point p1, Point p2)
-   {
-      return (p1.x == p2.x && Math.abs(p1.y - p2.y) == 1) ||
-         (p1.y == p2.y && Math.abs(p1.x - p2.x) == 1);
-   }
 
    public static Optional<Point> findOpenAround(WorldModel world, Point pos)
    {
@@ -540,7 +443,7 @@ final class Functions
          
          removePendingEvent(scheduler, next);
          
-         executeAction(next.action, scheduler);
+         next.action.executeAction(scheduler);
       }
    }
 
@@ -697,7 +600,7 @@ final class Functions
          Point pt = new Point(Integer.parseInt(properties[BGND_COL]),
             Integer.parseInt(properties[BGND_ROW]));
          String id = properties[BGND_ID];
-         setBackground(world, pt,
+         world.setBackground(pt,
             new Background(id, getImageList(imageStore, id)));
       }
 
@@ -809,11 +712,11 @@ final class Functions
       else
       {
          Entity nearest = entities.get(0);
-         int nearestDistance = distanceSquared(nearest.position, pos);
+         int nearestDistance = nearest.position.distanceSquared(pos);
 
          for (Entity other : entities)
          {
-            int otherDistance = distanceSquared(other.position, pos);
+            int otherDistance = other.position.distanceSquared(pos);
 
             if (otherDistance < nearestDistance)
             {
@@ -826,13 +729,6 @@ final class Functions
       }
    }
 
-   public static int distanceSquared(Point p1, Point p2)
-   {
-      int deltaX = p1.x - p2.x;
-      int deltaY = p1.y - p2.y;
-
-      return deltaX * deltaX + deltaY * deltaY;
-   }
 
    public static Optional<Entity> findNearest(WorldModel world, Point pos,
       EntityKind kind)
@@ -857,7 +753,7 @@ final class Functions
    {
       if (world.withinBounds(entity.position))
       {
-         setOccupancyCell(world, entity.position, entity);
+         world.setOccupancyCell(entity.position, entity);
          world.entities.add(entity);
       }
    }
@@ -867,39 +763,20 @@ final class Functions
       Point oldPos = entity.position;
       if (world.withinBounds(pos) && !pos.equals(oldPos))
       {
-         setOccupancyCell(world, oldPos, null);
-         removeEntityAt(world, pos);
-         setOccupancyCell(world, pos, entity);
+         world.setOccupancyCell(oldPos, null);
+         world.removeEntityAt(pos);
+         world.setOccupancyCell(pos, entity);
          entity.position = pos;
       }
    }
 
-   public static void removeEntity(WorldModel world, Entity entity)
-   {
-      removeEntityAt(world, entity.position);
-   }
-
-   public static void removeEntityAt(WorldModel world, Point pos)
-   {
-      if (world.withinBounds(pos)
-         && world.getOccupancyCell(pos) != null)
-      {
-         Entity entity = world.getOccupancyCell(pos);
-
-         /* this moves the entity just outside of the grid for
-            debugging purposes */
-         entity.position = new Point(-1, -1);
-         world.entities.remove(entity);
-         setOccupancyCell(world, pos, null);
-      }
-   }
 
    public static Optional<PImage> getBackgroundImage(WorldModel world,
       Point pos)
    {
       if (world.withinBounds(pos))
       {
-         return Optional.of(getCurrentImage(getBackgroundCell(world, pos)));
+         return Optional.of(getCurrentImage(world.getBackgroundCell(pos)));
       }
       else
       {
@@ -907,95 +784,13 @@ final class Functions
       }
    }
 
-   public static void setBackground(WorldModel world, Point pos,
-      Background background)
-   {
-      if (world.withinBounds(pos))
-      {
-         setBackgroundCell(world, pos, background);
-      }
-   }
 
-   public static void setOccupancyCell(WorldModel world, Point pos,
-      Entity entity)
-   {
-      world.occupancy[pos.y][pos.x] = entity;
-   }
-
-   public static Background getBackgroundCell(WorldModel world, Point pos)
-   {
-      return world.background[pos.y][pos.x];
-   }
-
-   public static void setBackgroundCell(WorldModel world, Point pos,
-      Background background)
-   {
-      world.background[pos.y][pos.x] = background;
-   }
-
-   public static Point viewportToWorld(Viewport viewport, int col, int row)
-   {
-      return new Point(col + viewport.col, row + viewport.row);
-   }
-
-   public static Point worldToViewport(Viewport viewport, int col, int row)
-   {
-      return new Point(col - viewport.col, row - viewport.row);
-   }
 
    public static int clamp(int value, int low, int high)
    {
       return Math.min(high, Math.max(value, low));
    }
 
-   public static void shiftView(WorldView view, int colDelta, int rowDelta)
-   {
-      int newCol = clamp(view.viewport.col + colDelta, 0,
-         view.world.numCols - view.viewport.numCols);
-      int newRow = clamp(view.viewport.row + rowDelta, 0,
-         view.world.numRows - view.viewport.numRows);
-
-      shift(view.viewport, newCol, newRow);
-   }
-
-   public static void drawBackground(WorldView view)
-   {
-      for (int row = 0; row < view.viewport.numRows; row++)
-      {
-         for (int col = 0; col < view.viewport.numCols; col++)
-         {
-            Point worldPoint = viewportToWorld(view.viewport, col, row);
-            Optional<PImage> image = getBackgroundImage(view.world,
-               worldPoint);
-            if (image.isPresent())
-            {
-               view.screen.image(image.get(), col * view.tileWidth,
-                  row * view.tileHeight);
-            }
-         }
-      }
-   }
-
-   public static void drawEntities(WorldView view)
-   {
-      for (Entity entity : view.world.entities)
-      {
-         Point pos = entity.position;
-
-         if (contains(view.viewport, pos))
-         {
-            Point viewPoint = worldToViewport(view.viewport, pos.x, pos.y);
-            view.screen.image(getCurrentImage(entity),
-               viewPoint.x * view.tileWidth, viewPoint.y * view.tileHeight);
-         }
-      }
-   }
-
-   public static void drawViewport(WorldView view)
-   {
-      drawBackground(view);
-      drawEntities(view);
-   }
 
    public static Action createAnimationAction(Entity entity, int repeatCount)
    {
