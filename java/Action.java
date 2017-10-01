@@ -22,8 +22,8 @@ final class Action
 
         if (this.repeatCount != 1)
         {
-            Functions.scheduleEvent(scheduler, this.entity,
-                    Functions.createAnimationAction(this.entity,
+            scheduler.scheduleEvent(this.entity,
+                    this.entity.createAnimationAction(
                             Math.max(this.repeatCount - 1, 0)),
                     this.entity.getAnimationPeriod());
         }

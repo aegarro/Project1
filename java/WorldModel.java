@@ -1,7 +1,6 @@
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import processing.core.PImage;
+
+import java.util.*;
 
 final class WorldModel
 {
@@ -88,6 +87,74 @@ final class WorldModel
             this.entities.remove(entity);
             this.setOccupancyCell(pos, null);
         }
+    }
+
+    public Optional<Entity> findNearest(Point pos, EntityKind kind)
+    {
+        List<Entity> ofType = new LinkedList<>();
+        for (Entity entity : this.entities)
+        {
+            if (entity.kind == kind)
+            {
+                ofType.add(entity);
+            }
+        }
+
+        return Functions.nearestEntity(ofType, pos);
+    }
+
+    /*
+       Assumes that there is no entity currently occupying the
+       intended destination cell.
+    */
+    public void addEntity(Entity entity)
+    {
+        if (this.withinBounds(entity.position))
+        {
+            this.setOccupancyCell(entity.position, entity);
+            this.entities.add(entity);
+        }
+    }
+
+    public void tryAddEntity(Entity entity)
+    {
+        if (this.isOccupied(entity.position))
+        {
+            // arguably the wrong type of exception, but we are not
+            // defining our own exceptions yet
+            throw new IllegalArgumentException("position occupied");
+        }
+
+        this.addEntity(entity);
+    }
+
+    public void moveEntity(Entity entity, Point pos)
+    {
+        Point oldPos = entity.position;
+        if (this.withinBounds(pos) && !pos.equals(oldPos))
+        {
+            this.setOccupancyCell(oldPos, null);
+            this.removeEntityAt(pos);
+            this.setOccupancyCell(pos, entity);
+            entity.position = pos;
+        }
+    }
+
+    public Optional<PImage> getBackgroundImage(Point pos)
+    {
+        if (this.withinBounds(pos))
+        {
+            return Optional.of(Functions.getCurrentImage(this.getBackgroundCell(pos)));
+        }
+        else
+        {
+            return Optional.empty();
+        }
+    }
+
+    public void removeEntity(Entity entity)
+    {
+        this.removeEntityAt(entity.position);
     }
 }
 

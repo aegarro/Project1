@@ -94,11 +94,16 @@ final class Entity
                                 this.kind));
         }
     }
-    public void removeEntity(WorldModel world)
+
+    public Action createAnimationAction(int repeatCount)
     {
-        world.removeEntityAt(this.position);
+        return new Action(ActionKind.ANIMATION, this, null, null, repeatCount);
     }
 
-
+    public Action createActivityAction(WorldModel world,
+                                              ImageStore imageStore)
+    {
+        return new Action(ActionKind.ACTIVITY, this, world, imageStore, 0);
+    }
 
 }

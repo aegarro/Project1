@@ -33,7 +33,7 @@ final class WorldView
         {
             Point pos = entity.position;
 
-            if (Functions.contains(this.viewport, pos))
+            if (this.viewport.contains(pos))
             {
                 Point viewPoint = this.viewport.worldToViewport(pos.x, pos.y);
                 this.screen.image(Functions.getCurrentImage(entity),
@@ -49,8 +49,7 @@ final class WorldView
             for (int col = 0; col < this.viewport.numCols; col++)
             {
                 Point worldPoint = this.viewport.viewportToWorld(col, row);
-                Optional<PImage> image = Functions.getBackgroundImage(this.world,
-                        worldPoint);
+                Optional<PImage> image = this.world.getBackgroundImage(worldPoint);
                 if (image.isPresent())
                 {
                     this.screen.image(image.get(), col * this.tileWidth,
@@ -67,7 +66,7 @@ final class WorldView
         int newRow = Functions.clamp(this.viewport.row + rowDelta, 0,
                 this.world.numRows - this.viewport.numRows);
 
-        Functions.shift(this.viewport, newCol, newRow);
+        this.viewport.shift(newCol, newRow);
     }
 
 }
