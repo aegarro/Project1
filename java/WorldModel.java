@@ -156,5 +156,23 @@ final class WorldModel
     {
         this.removeEntityAt(entity.position);
     }
+
+    public Optional<Point> findOpenAround(Point pos)
+    {
+        for (int dy = -Functions.ORE_REACH; dy <= Functions.ORE_REACH; dy++)
+        {
+            for (int dx = -Functions.ORE_REACH; dx <= Functions.ORE_REACH; dx++)
+            {
+                Point newPt = new Point(pos.x + dx, pos.y + dy);
+                if (this.withinBounds(newPt) &&
+                        !this.isOccupied(newPt))
+                {
+                    return Optional.of(newPt);
+                }
+            }
+        }
+
+        return Optional.empty();
+    }
 }
 
