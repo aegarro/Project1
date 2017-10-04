@@ -14,7 +14,6 @@ final class Functions
    public static final String QUAKE_ID = "quake";
    public static final int QUAKE_ACTION_PERIOD = 1100;
    public static final int QUAKE_ANIMATION_PERIOD = 100;
-   public static final int QUAKE_ANIMATION_REPEAT_COUNT = 10;
 
    public static final int COLOR_MASK = 0xffffff;
    public static final int KEYED_IMAGE_MIN = 5;
@@ -22,9 +21,7 @@ final class Functions
    private static final int KEYED_GREEN_IDX = 3;
    private static final int KEYED_BLUE_IDX = 4;
 
-   public static final int PROPERTY_KEY = 0;
 
-   public static final String BGND_KEY = "background";
    public static final int BGND_NUM_PROPERTIES = 4;
    public static final int BGND_ID = 1;
    public static final int BGND_COL = 2;
@@ -86,134 +83,6 @@ final class Functions
    }
 
 
-   public static void scheduleActions(Entity entity, EventScheduler scheduler,
-      WorldModel world, ImageStore imageStore)
-   {
-      switch (entity.kind)
-      {
-      case MINER_FULL:
-         scheduler.scheduleEvent(entity,
-            entity.createActivityAction(world, imageStore),
-            entity.actionPeriod);
-         scheduler.scheduleEvent(entity, entity.createAnimationAction(0),
-            entity.getAnimationPeriod());
-         break;
-
-      case MINER_NOT_FULL:
-         scheduler.scheduleEvent(entity,
-            entity.createActivityAction(world, imageStore),
-            entity.actionPeriod);
-         scheduler.scheduleEvent(entity,
-            entity.createAnimationAction(0), entity.getAnimationPeriod());
-         break;
-
-      case ORE:
-         scheduler.scheduleEvent(entity,
-            entity.createActivityAction(world, imageStore),
-            entity.actionPeriod);
-         break;
-
-      case ORE_BLOB:
-         scheduler.scheduleEvent(entity,
-            entity.createActivityAction(world, imageStore),
-            entity.actionPeriod);
-         scheduler.scheduleEvent(entity,
-            entity.createAnimationAction(0), entity.getAnimationPeriod());
-         break;
-
-      case QUAKE:
-         scheduler.scheduleEvent(entity,
-            entity.createActivityAction(world, imageStore),
-            entity.actionPeriod);
-         scheduler.scheduleEvent(entity,
-            entity.createAnimationAction(QUAKE_ANIMATION_REPEAT_COUNT),
-            entity.getAnimationPeriod());
-         break;
-
-      case VEIN:
-         scheduler.scheduleEvent(entity,
-            entity.createActivityAction(world, imageStore),
-            entity.actionPeriod);
-         break;
-
-      default:
-      }
-   }
-
-   public static boolean moveToNotFull(Entity miner, WorldModel world,
-      Entity target, EventScheduler scheduler)
-   {
-      if (miner.position.adjacent(target.position))
-      {
-         miner.resourceCount += 1;
-         world.removeEntity(target);
-         scheduler.unscheduleAllEvents(target);
-
-         return true;
-      }
-      else
-      {
-         Point nextPos = miner.nextPositionMiner(world, target.position);
-
-         if (!miner.position.equals(nextPos))
-         {
-            Optional<Entity> occupant = world.getOccupant(nextPos);
-            if (occupant.isPresent())
-            {
-               scheduler.unscheduleAllEvents(occupant.get());
-            }
-
-            world.moveEntity(miner, nextPos);
-         }
-         return false;
-      }
-   }
-
-   public static boolean moveToFull(Entity miner, WorldModel world,
-      Entity target, EventScheduler scheduler)
-   {
-      if (miner.position.adjacent(target.position))
-      {
-         return true;
-      }
-      else
-      {
-         Point nextPos = miner.nextPositionMiner(world, target.position);
-
-         if (!miner.position.equals(nextPos))
-         {
-            Optional<Entity> occupant = world.getOccupant(nextPos);
-            if (occupant.isPresent())
-            {
-               scheduler.unscheduleAllEvents(occupant.get());
-            }
-
-            world.moveEntity(miner, nextPos);
-         }
-         return false;
-      }
-   }
-
-
-   public static void loadImages(Scanner in, ImageStore imageStore,
-      PApplet screen)
-   {
-      int lineNumber = 0;
-      while (in.hasNextLine())
-      {
-         try
-         {
-            processImageLine(imageStore.images, in.nextLine(), screen);
-         }
-         catch (NumberFormatException e)
-         {
-            System.out.println(String.format("Image format error on line %d",
-               lineNumber));
-         }
-         lineNumber++;
-      }
-   }
-
    public static void processImageLine(Map<String, List<PImage>> images,
       String line, PApplet screen)
    {
@@ -268,61 +137,8 @@ final class Functions
          }
       }
       img.updatePixels();
-   }
+}
 
-
-   public static void load(Scanner in, WorldModel world, ImageStore imageStore)
-   {
-      int lineNumber = 0;
-      while (in.hasNextLine())
-      {
-         try
-         {
-            if (!processLine(in.nextLine(), world, imageStore))
-            {
-               System.err.println(String.format("invalid entry on line %d",
-                  lineNumber));
-            }
-         }
-         catch (NumberFormatException e)
-         {
-            System.err.println(String.format("invalid entry on line %d",
-               lineNumber));
-         }
-         catch (IllegalArgumentException e)
-         {
-            System.err.println(String.format("issue on line %d: %s",
-               lineNumber, e.getMessage()));
-         }
-         lineNumber++;
-      }
-   }
-
-   public static boolean processLine(String line, WorldModel world,
-      ImageStore imageStore)
-   {
-      String[] properties = line.split("\\s");
-      if (properties.length > 0)
-      {
-         switch (properties[PROPERTY_KEY])
-         {
-         case BGND_KEY:
-            return parseBackground(properties, world, imageStore);
-         case MINER_KEY:
-            return parseMiner(properties, world, imageStore);
-         case OBSTACLE_KEY:
-            return parseObstacle(properties, world, imageStore);
-         case ORE_KEY:
-            return parseOre(properties, world, imageStore);
-         case SMITH_KEY:
-            return parseSmith(properties, world, imageStore);
-         case VEIN_KEY:
-            return parseVein(properties, world, imageStore);
-         }
-      }
-
-      return false;
-   }
 
    public static boolean parseBackground(String [] properties,
       WorldModel world, ImageStore imageStore)
@@ -448,12 +264,6 @@ final class Functions
 
          return Optional.of(nearest);
       }
-   }
-
-
-   public static int clamp(int value, int low, int high)
-   {
-      return Math.min(high, Math.max(value, low));
    }
 
 

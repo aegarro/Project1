@@ -42,6 +42,9 @@ public final class VirtualWorld
 
    public long next_time;
 
+   public static final int PROPERTY_KEY = 0;
+   public static final String BGND_KEY = "background";
+
    public void settings()
    {
       size(VIEW_WIDTH, VIEW_HEIGHT);
@@ -130,7 +133,7 @@ public final class VirtualWorld
       try
       {
          Scanner in = new Scanner(new File(filename));
-         Functions.loadImages(in, imageStore, screen);
+         imageStore.loadImages(in, screen);
       }
       catch (FileNotFoundException e)
       {
@@ -144,7 +147,7 @@ public final class VirtualWorld
       try
       {
          Scanner in = new Scanner(new File(filename));
-         Functions.load(in, world, imageStore);
+         load(in, world, imageStore);
       }
       catch (FileNotFoundException e)
       {
@@ -157,7 +160,7 @@ public final class VirtualWorld
    {
       for (Entity entity : world.entities)
       {
-         Functions.scheduleActions(entity, scheduler, world, imageStore);
+         entity.scheduleActions(scheduler, world, imageStore);
       }
    }
 
@@ -180,9 +183,62 @@ public final class VirtualWorld
       }
    }
 
+    private static void load(Scanner in, WorldModel world, ImageStore imageStore)
+    {
+        int lineNumber = 0;
+        while (in.hasNextLine())
+        {
+            try
+            {
+                if (!processLine(in.nextLine(), world, imageStore))
+                {
+                    System.err.println(String.format("invalid entry on line %d",
+                            lineNumber));
+                }
+            }
+            catch (NumberFormatException e)
+            {
+                System.err.println(String.format("invalid entry on line %d",
+                        lineNumber));
+            }
+            catch (IllegalArgumentException e)
+            {
+                System.err.println(String.format("issue on line %d: %s",
+                        lineNumber, e.getMessage()));
+            }
+            lineNumber++;
+        }
+    }
+
    public static void main(String [] args)
    {
       parseCommandLine(args);
       PApplet.main(VirtualWorld.class);
    }
+
+    private static boolean processLine(String line, WorldModel world,
+                                      ImageStore imageStore)
+    {
+        String[] properties = line.split("\\s");
+        if (properties.length > 0)
+        {
+            switch (properties[PROPERTY_KEY])
+            {
+                case BGND_KEY:
+                    return Functions.parseBackground(properties, world, imageStore);
+                case Functions.MINER_KEY:
+                    return Functions.parseMiner(properties, world, imageStore);
+                case Functions.OBSTACLE_KEY:
+                    return Functions.parseObstacle(properties, world, imageStore);
+                case Functions.ORE_KEY:
+                    return Functions.parseOre(properties, world, imageStore);
+                case Functions.SMITH_KEY:
+                    return Functions.parseSmith(properties, world, imageStore);
+                case Functions.VEIN_KEY:
+                    return Functions.parseVein(properties, world, imageStore);
+            }
+        }
+
+        return false;
+    }
 }
