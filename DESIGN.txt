@@ -25,8 +25,8 @@ The 6 functions above moved to World Model, yet could also be put into ImageStor
 The WorldModel and ImageStore are soley passed in so another function can be called,
 so it could of also have been left in functions.
 
-Helper functions such as Clamp(), setAlpha(), load(), processLine() are all helper functions.
-They were made private and were placed in the class where the function is called.
+Helper functions such as Clamp(), setAlpha(), load(), processLine(), createDefaultBackground(), createImageColored() LoadWorld(), were made private
+and were placed in the class where the function is called.
 
 getCurrentImage(Object entity) was left in functions because it does not take a class as a parameter,
 and it is called in both WorldModel and WorldView.
