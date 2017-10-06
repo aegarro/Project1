@@ -225,17 +225,17 @@ public final class VirtualWorld
             switch (properties[PROPERTY_KEY])
             {
                 case BGND_KEY:
-                    return Functions.parseBackground(properties, world, imageStore);
-                case Functions.MINER_KEY:
-                    return Functions.parseMiner(properties, world, imageStore);
-                case Functions.OBSTACLE_KEY:
-                    return Functions.parseObstacle(properties, world, imageStore);
-                case Functions.ORE_KEY:
-                    return Functions.parseOre(properties, world, imageStore);
-                case Functions.SMITH_KEY:
-                    return Functions.parseSmith(properties, world, imageStore);
-                case Functions.VEIN_KEY:
-                    return Functions.parseVein(properties, world, imageStore);
+                    return world.parseBackground(properties, imageStore);
+                case WorldModel.MINER_KEY:
+                    return world.parseMiner(properties, imageStore);
+                case WorldModel.OBSTACLE_KEY:
+                    return world.parseObstacle(properties, imageStore);
+                case WorldModel.ORE_KEY:
+                    return world.parseOre(properties, imageStore);
+                case WorldModel.SMITH_KEY:
+                    return world.parseSmith(properties, imageStore);
+                case WorldModel.VEIN_KEY:
+                    return world.parseVein(properties, imageStore);
             }
         }
 
