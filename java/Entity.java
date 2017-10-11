@@ -9,8 +9,8 @@ final class Entity
    private EntityKind kind;
    private String id;
    private Point position;
-   public List<PImage> images;
-   public int imageIndex;
+   private List<PImage> images;
+   private int imageIndex;
    private int resourceLimit;
    private int resourceCount;
    private int actionPeriod;
@@ -51,6 +51,13 @@ final class Entity
 
 
    }
+
+   public int getImageIndex(){
+        return this.imageIndex;
+}
+    public List<PImage> getImages(){
+       return this.images;
+}
 
    public Point getPosition(){
         return this.position;
@@ -165,7 +172,7 @@ final class Entity
                 !this.transformNotFull(world, scheduler, imageStore))
         {
             scheduler.scheduleEvent(this,
-                    this.createActivityAction(world, imageStore),
+                    Action.createActivityAction(this, world, imageStore),
                     this.actionPeriod);
         }
     }
@@ -181,7 +188,7 @@ final class Entity
                 pos, this.actionPeriod / BLOB_PERIOD_SCALE,
                 BLOB_ANIMATION_MIN +
                         rand.nextInt(BLOB_ANIMATION_MAX - BLOB_ANIMATION_MIN),
-                imageStore.getImageList(BLOB_KEY));
+                imageStore.getImageList(Functions.BLOB_KEY));
 
         world.addEntity(blob);
         blob.scheduleActions(scheduler, world, imageStore);
@@ -200,7 +207,7 @@ final class Entity
             if (this.moveToOreBlob(world, blobTarget.get(), scheduler))
             {
                 Entity quake = createQuake(tgtPos,
-                        imageStore.getImageList(QUAKE_KEY));
+                        imageStore.getImageList(Functions.QUAKE_KEY));
 
                 world.addEntity(quake);
                 nextPeriod += this.actionPeriod;
@@ -209,27 +216,27 @@ final class Entity
         }
 
         scheduler.scheduleEvent(this,
-                this.createActivityAction(world, imageStore),
+                Action.createActivityAction(this, world, imageStore),
                 nextPeriod);
     }
 
 
     public void executeVeinActivity(WorldModel world, ImageStore imageStore, EventScheduler scheduler)
     {
-        Optional<Point> openPt = world.findOpenAround(this.position);
+        Optional<Point> openPt = findOpenAround(world, this.position);
 
         if (openPt.isPresent())
         {
             Entity ore = createOre(ORE_ID_PREFIX + this.id,
                     openPt.get(), ORE_CORRUPT_MIN +
                             rand.nextInt(ORE_CORRUPT_MAX - ORE_CORRUPT_MIN),
-                    imageStore.getImageList(WorldModel.ORE_KEY));
+                    imageStore.getImageList(Functions.ORE_KEY));
             world.addEntity(ore);
             ore.scheduleActions(scheduler, world, imageStore);
         }
 
         scheduler.scheduleEvent(this,
-                this.createActivityAction(world, imageStore),
+                Action.createActivityAction(this, world, imageStore),
                 this.actionPeriod);
     }
 
@@ -298,46 +305,46 @@ final class Entity
         {
             case MINER_FULL:
                 scheduler.scheduleEvent(this,
-                        this.createActivityAction(world, imageStore),
+                        Action.createActivityAction(this, world, imageStore),
                         this.actionPeriod);
-                scheduler.scheduleEvent(this, this.createAnimationAction(0),
+                scheduler.scheduleEvent(this, Action.createAnimationAction(this, 0),
                         this.getAnimationPeriod());
                 break;
 
             case MINER_NOT_FULL:
                 scheduler.scheduleEvent(this,
-                        this.createActivityAction(world, imageStore),
+                        Action.createActivityAction(this, world, imageStore),
                         this.actionPeriod);
                 scheduler.scheduleEvent(this,
-                        this.createAnimationAction(0), this.getAnimationPeriod());
+                        Action.createAnimationAction(this,0), this.getAnimationPeriod());
                 break;
 
             case ORE:
                 scheduler.scheduleEvent(this,
-                        this.createActivityAction(world, imageStore),
+                        Action.createActivityAction(this, world, imageStore),
                         this.actionPeriod);
                 break;
 
             case ORE_BLOB:
                 scheduler.scheduleEvent(this,
-                        this.createActivityAction(world, imageStore),
+                        Action.createActivityAction(this, world, imageStore),
                         this.actionPeriod);
                 scheduler.scheduleEvent(this,
-                        this.createAnimationAction(0), this.getAnimationPeriod());
+                        Action.createAnimationAction(this, 0), this.getAnimationPeriod());
                 break;
 
             case QUAKE:
                 scheduler.scheduleEvent(this,
-                        this.createActivityAction(world, imageStore),
+                        Action.createActivityAction(this, world, imageStore),
                         this.actionPeriod);
                 scheduler.scheduleEvent(this,
-                        this.createAnimationAction(QUAKE_ANIMATION_REPEAT_COUNT),
+                        Action.createAnimationAction(this, QUAKE_ANIMATION_REPEAT_COUNT),
                         this.getAnimationPeriod());
                 break;
 
             case VEIN:
                 scheduler.scheduleEvent(this,
-                        this.createActivityAction(world, imageStore),
+                        Action.createActivityAction(this, world, imageStore),
                         this.actionPeriod);
                 break;
 
@@ -455,13 +462,13 @@ final class Entity
     }
     public Optional<Point> findOpenAround(WorldModel world, Point pos)
     {
-        for (int dy = -Functions.ORE_REACH; dy <= Functions.ORE_REACH; dy++)
+        for (int dy = -ORE_REACH; dy <= ORE_REACH; dy++)
         {
-            for (int dx = -Functions.ORE_REACH; dx <= Functions.ORE_REACH; dx++)
+            for (int dx = -ORE_REACH; dx <= ORE_REACH; dx++)
             {
                 Point newPt = new Point(pos.x + dx, pos.y + dy);
-                if (withinBounds(world, newPt) &&
-                        !isOccupied(world, newPt))
+                if (world.withinBounds(newPt) &&
+                        !world.isOccupied(newPt))
                 {
                     return Optional.of(newPt);
                 }

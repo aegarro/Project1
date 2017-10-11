@@ -23,7 +23,7 @@ final class Action
         if (this.repeatCount != 1)
         {
             scheduler.scheduleEvent(this.entity,
-                    this.entity.createAnimationAction(
+                    this.createAnimationAction(this.entity,
                             Math.max(this.repeatCount - 1, 0)),
                     this.entity.getAnimationPeriod());
         }
@@ -31,7 +31,7 @@ final class Action
 
     public void executeActivityAction(EventScheduler scheduler)
     {
-        switch (this.entity.kind)
+        switch (this.entity.getKind())
         {
             case MINER_FULL:
                 this.entity.executeMinerFullActivity(this.world,
@@ -66,7 +66,7 @@ final class Action
             default:
                 throw new UnsupportedOperationException(
                         String.format("executeActivityAction not supported for %s",
-                                this.entity.kind));
+                                this.entity.getKind()));
         }
     }
 
@@ -82,6 +82,17 @@ final class Action
                 this.executeAnimationAction(scheduler);
                 break;
         }
+    }
+    public static Action createAnimationAction(Entity entity, int repeatCount)
+    {
+        return new Action(ActionKind.ANIMATION, entity, null, null, repeatCount);
+    }
+
+
+    public static Action createActivityAction(Entity entity, WorldModel world,
+                                       ImageStore imageStore)
+    {
+        return new Action(ActionKind.ACTIVITY, entity, world, imageStore, 0);
     }
 
 }
