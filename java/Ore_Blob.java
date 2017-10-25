@@ -45,7 +45,7 @@ public class Ore_Blob {
         }
         else {
             throw new UnsupportedOperationException(String.format("getCurrentImage not " +
-                    "supportedfor Ore_Blob"));
+                    "supported for Ore_Blob"));
         }
     }
 
@@ -103,7 +103,7 @@ public class Ore_Blob {
     }
 
 
-    public void executeOreBlobActivity(WorldModel world, ImageStore imageStore, EventScheduler scheduler)
+    public void executeActivity(WorldModel world, ImageStore imageStore, EventScheduler scheduler)
     {
         Optional<Entity> blobTarget = world.findNearest(
                 this.position, EntityKind.VEIN);

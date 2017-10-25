@@ -57,7 +57,7 @@ public class Quake implements Entity{
         }
         else {
             throw new UnsupportedOperationException(String.format("getCurrentImage not " +
-                    "supportedfor Quake"));
+                    "supported for Quake"));
         }
     }
 

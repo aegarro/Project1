@@ -37,7 +37,7 @@ public class Vein implements Entity{
         }
         else {
             throw new UnsupportedOperationException(String.format("getCurrentImage not " +
-                    "supportedfor Vein"));
+                    "supported for Vein"));
         }
     }
 

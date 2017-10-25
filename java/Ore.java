@@ -3,7 +3,7 @@ import java.util.Optional;
 import java.util.Random;
 
 import processing.core.PImage;
-public class Ore implements Entity{
+public class Ore implements Entity {
     private String id;
     private Point position;
     private List<PImage> images;
@@ -21,11 +21,9 @@ public class Ore implements Entity{
     private static final int ORE_REACH = 1;
 
 
-
     public Ore(String id, Point position,
-                  List<PImage> images, int resourceLimit, int resourceCount,
-                  int actionPeriod, int animationPeriod)
-    {
+               List<PImage> images, int resourceLimit, int resourceCount,
+               int actionPeriod, int animationPeriod) {
         this.id = id;
         this.position = position;
         this.images = images;
@@ -38,27 +36,28 @@ public class Ore implements Entity{
 
     }
 
-    public PImage getCurrentImage(){
+    public PImage getCurrentImage() {
         if (this instanceof Background) {
-            return ((Background)this).images.get(((Background)this).imageIndex);
+            return ((Background) this).images.get(((Background)this).imageIndex);
         }
         else if (this instanceof Entity) {
-            return ((Entity)this).images.get(((Entity) this).imageIndex);
+            return ((Entity) this).images.get(((Entity) this).imageIndex);
         }
         else {
             throw new UnsupportedOperationException(String.format("getCurrentImage not " +
-                    "supportedfor Ore"));
+                    "supported for Ore"));
         }
     }
-    public int getImageIndex(){
+
+    public int getImageIndex() {
         return this.imageIndex;
     }
 
-    public List<PImage> getImages(){
+    public List<PImage> getImages() {
         return this.images;
     }
 
-    public Point getPosition(){
+    public Point getPosition() {
         return this.position;
     }
 
@@ -66,19 +65,16 @@ public class Ore implements Entity{
         this.position = position;
     }
 
-    public  void nextImage()
-    {
+    public void nextImage() {
         this.imageIndex = (this.imageIndex + 1) % this.images.size();
     }
 
-    public int getAnimationPeriod()
-    {
+    public int getAnimationPeriod() {
         throw new UnsupportedOperationException(String.format("getAnimationPeriod not supported for Ore"));
-        }
+    }
 
 
-    public void executeOreActivity(WorldModel world, ImageStore imageStore, EventScheduler scheduler)
-    {
+    public void executeActivity(WorldModel world, ImageStore imageStore, EventScheduler scheduler) {
         Point pos = this.position;  // store current position before removing
 
         world.removeEntity(this);
@@ -94,20 +90,19 @@ public class Ore implements Entity{
         blob.scheduleActions(scheduler, world, imageStore);
     }
 
-//HOW WILL IT KNOW IT WILL GO TO ACTIVITY ACTION
+    //HOW WILL IT KNOW IT WILL GO TO ACTIVITY ACTION
     //
     //
-    public void scheduleActions(EventScheduler scheduler, WorldModel world, ImageStore imageStore)
-    {
+    public void scheduleActions(EventScheduler scheduler, WorldModel world, ImageStore imageStore) {
         scheduler.scheduleEvent(this, Action.createActivityAction(this, world, imageStore), this.actionPeriod);
 
     }
 
 
     public static Ore createOre(String id, Point position, int actionPeriod,
-                                   List<PImage> images)
-    {
+                                List<PImage> images) {
         return new Ore(id, position, images, 0, 0,
                 actionPeriod, 0);
     }
+}
 

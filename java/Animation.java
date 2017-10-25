@@ -3,7 +3,7 @@ public class Animation implements Action{
     private WorldModel world;
     private ImageStore imageStore;
     private int repeatCount;
-}
+
     public Animation(Entity entity, WorldModel world,
                      ImageStore imageStore, int repeatCount){
         this.entity = entity;
@@ -23,6 +23,7 @@ public class Animation implements Action{
     }
 
     public static Action createAction(Entity entity, int repeatCount) {
-        return new Action(ActionKind.ANIMATION, entity, null, null, repeatCount);
+        return new Animation(entity, null, null, repeatCount);
     }
 }
+

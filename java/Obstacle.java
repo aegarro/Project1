@@ -16,7 +16,6 @@ public class Obstacle implements Entity{
     private static final Random rand = new Random();
 
 
-
     public Obstacle(String id, Point position,
                   List<PImage> images, int resourceLimit, int resourceCount,
                   int actionPeriod, int animationPeriod)
@@ -55,7 +54,7 @@ public class Obstacle implements Entity{
         this.imageIndex = (this.imageIndex + 1) % this.images.size();
     }
 
-    public int getAnimationPeriod()
+    public String getAnimationPeriod()
     {
         throw new UnsupportedOperationException(String.format("getAnimationPeriod not supported for Obstacle"));
         }
@@ -64,56 +63,7 @@ public class Obstacle implements Entity{
 
     public void scheduleActions(EventScheduler scheduler, WorldModel world, ImageStore imageStore)
     {
-        switch (this.kind)
-        {
-            case MINER_FULL:
-                scheduler.scheduleEvent(this,
-                        Action.createActivityAction(this, world, imageStore),
-                        this.actionPeriod);
-                scheduler.scheduleEvent(this, Action.createAnimationAction(this, 0),
-                        this.getAnimationPeriod());
-                break;
-
-            case MINER_NOT_FULL:
-                scheduler.scheduleEvent(this,
-                        Action.createActivityAction(this, world, imageStore),
-                        this.actionPeriod);
-                scheduler.scheduleEvent(this,
-                        Action.createAnimationAction(this,0), this.getAnimationPeriod());
-                break;
-
-            case ORE:
-                scheduler.scheduleEvent(this,
-                        Action.createActivityAction(this, world, imageStore),
-                        this.actionPeriod);
-                break;
-
-            case ORE_BLOB:
-                scheduler.scheduleEvent(this,
-                        Action.createActivityAction(this, world, imageStore),
-                        this.actionPeriod);
-                scheduler.scheduleEvent(this,
-                        Action.createAnimationAction(this, 0), this.getAnimationPeriod());
-                break;
-
-            case QUAKE:
-                scheduler.scheduleEvent(this,
-                        Action.createActivityAction(this, world, imageStore),
-                        this.actionPeriod);
-                scheduler.scheduleEvent(this,
-                        Action.createAnimationAction(this, QUAKE_ANIMATION_REPEAT_COUNT),
-                        this.getAnimationPeriod());
-                break;
-
-            case VEIN:
-                scheduler.scheduleEvent(this,
-                        Action.createActivityAction(this, world, imageStore),
-                        this.actionPeriod);
-                break;
-
-            default:
         }
-    }
 
 
     public static Obstacle createObstacle(String id, Point position,
@@ -122,5 +72,11 @@ public class Obstacle implements Entity{
         return new Obstacle(id, position, images,
                 0, 0, 0, 0);
     }
+
+    public String executeActivity(WorldModel world, ImageStore imageStore, EventScheduler scheduler){
+        throw new UnsupportedOperationException(
+                String.format("executeActivityAction not supported for Obstacle"));
+    }
+
 
 }

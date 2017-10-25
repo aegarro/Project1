@@ -69,7 +69,7 @@ public class Blacksmith {
 
     public int getAnimationPeriod() {
         throw new UnsupportedOperationException(
-                String.format("getAnimationPeriod not supported for Blacksmith");
+                String.format("getAnimationPeriod not supported for Blacksmith"));
         }
 
 
@@ -77,5 +77,10 @@ public class Blacksmith {
                                           List<PImage> images)
     {
         return new Blacksmith(id, position, images, 0, 0, 0, 0);
+    }
+
+    public String executeActivity(WorldModel world, ImageStore imageStore, EventScheduler scheduler){
+        throw new UnsupportedOperationException(
+                String.format("executeActivityAction not supported for Blacksmith"));
     }
 }

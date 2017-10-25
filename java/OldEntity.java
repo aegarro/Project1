@@ -479,4 +479,4 @@ final class Entity
         return Optional.empty();
     }
 }
-/
+*/
