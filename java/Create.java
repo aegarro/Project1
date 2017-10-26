@@ -18,8 +18,7 @@ public class Create {
     public static Obstacle createObstacle(String id, Point position,
                                           List<PImage> images)
     {
-        return new Obstacle(id, position, images,
-                0, 0, 0, 0);
+        return new Obstacle(id, position, images);
     }
     public static Vein createVein(String id, Point position, int actionPeriod,
                                   List<PImage> images)
