@@ -1,4 +1,4 @@
-import java.util.LinkedList;
+/*import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -118,10 +118,10 @@ final class Functions
       return imgs;
    }
 
-   /*
- Called with color for which alpha should be set and alpha value.
- setAlpha(img, color(255, 255, 255), 0));
-*/
+
+ //Called with color for which alpha should be set and alpha value.
+ //setAlpha(img, color(255, 255, 255), 0));
+
    private static void setAlpha(PImage img, int maskColor, int alpha)
    {
       int alphaValue = alpha << 24;
@@ -284,4 +284,4 @@ final class Functions
    }
 
 
-}
+}*/

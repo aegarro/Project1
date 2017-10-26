@@ -71,18 +71,18 @@ public class Ore implements Entity, Actor, Schedulable {
         world.removeEntity(this);
         scheduler.unscheduleAllEvents(this);
 
-        Ore_Blob blob = createOreBlob(this.id + BLOB_ID_SUFFIX,
+        Ore_Blob blob = Create.createOreBlob(this.id + BLOB_ID_SUFFIX,
                 pos, this.actionPeriod / BLOB_PERIOD_SCALE,
                 BLOB_ANIMATION_MIN +
                         rand.nextInt(BLOB_ANIMATION_MAX - BLOB_ANIMATION_MIN),
-                imageStore.getImageList(Functions.BLOB_KEY));
+                imageStore.getImageList());
+                //BLOB_KEY
         world.addEntity(blob);
         blob.scheduleActions(scheduler, world, imageStore);
     }
 
-    //HOW WILL IT KNOW IT WILL GO TO ACTIVITY ACTION
     public void scheduleActions(EventScheduler scheduler, WorldModel world, ImageStore imageStore) {
-        scheduler.scheduleEvent(this, Action.createActivityAction(this, world, imageStore), this.actionPeriod);
+        scheduler.scheduleEvent(this, ActionFactory.createActivityAction(this, world, imageStore), this.actionPeriod);
 
     }
 

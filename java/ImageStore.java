@@ -16,11 +16,13 @@ final class ImageStore
       defaultImages = new LinkedList<>();
       defaultImages.add(defaultImage);
    }
-    public List<PImage> getImageList(String key)
+    public List<PImage> getImageList()
     {
-        return this.images.getOrDefault(key, this.defaultImages);
+        return this.defaultImages;
+
+        // OG: Param - (String key) return this.images.getOrDefault(key, this.defaultImages);
     }
-    public  Map<String, List<PImage>> getImage(){
+    public  Map<String, List<PImage>> images(){
        return this.images;
     }
 

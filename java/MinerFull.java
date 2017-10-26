@@ -1,4 +1,5 @@
 import processing.core.PImage;
+import java.util.Optional;
 
 import java.util.List;
 
@@ -34,6 +35,27 @@ public class MinerFull implements Entity, Schedulable, AnimatedActor{
         this.position = position;
     }
 
+    private Point nextPosition(WorldModel world, Point destPos)
+    {
+        int horiz = Integer.signum(destPos.x - this.position.x);
+        Point newPos = new Point(this.position.x + horiz,
+                this.position.y);
+
+        if (horiz == 0 || world.isOccupied(newPos))
+        {
+            int vert = Integer.signum(destPos.y - this.position.y);
+            newPos = new Point(this.position.x,
+                    this.position.y + vert);
+
+            if (vert == 0 || world.isOccupied(newPos))
+            {
+                newPos = this.position;
+            }
+        }
+
+        return newPos;
+    }
+
     public int getAnimationPeriod() {
         return this.animationPeriod;
     }
@@ -44,22 +66,10 @@ public class MinerFull implements Entity, Schedulable, AnimatedActor{
     }
 
 
-    public void executeMinerFullActivity(WorldModel world, ImageStore imageStore, EventScheduler scheduler) {
-        Optional<Entity> fullTarget = world.findNearest(this.position,
-                EntityKind.BLACKSMITH);
-
-        if (fullTarget.isPresent() &&
-                this.moveToFull(world, fullTarget.get(), scheduler)) {
-            this.transformFull(world, scheduler, imageStore);
-        } else {
-            scheduler.scheduleEvent(this, Action.createActivityAction(this, world, imageStore), this.actionPeriod);
-        }
-    }
-
     public void scheduleActions(EventScheduler scheduler, WorldModel world, ImageStore imageStore) {
-        scheduler.scheduleEvent(this, Action.createActivityAction(this, world, imageStore),
+        scheduler.scheduleEvent(this, ActionFactory.createActivityAction(this, world, imageStore),
                 this.actionPeriod);
-        scheduler.scheduleEvent(this, Action.createAnimationAction(this, 0),
+        scheduler.scheduleEvent(this, ActionFactory.createAnimationAction(this, 0),
                 this.getAnimationPeriod());
     }
 
@@ -70,15 +80,15 @@ public class MinerFull implements Entity, Schedulable, AnimatedActor{
     }
 
 
-    private boolean moveToFull(WorldModel world, Entity target, EventScheduler scheduler)
+    private boolean moveTo(WorldModel world, Entity target, EventScheduler scheduler)
     {
-        if (this.adjacent(target.position))
+        if (this.adjacent(target.position()))
         {
             return true;
         }
         else
         {
-            Point nextPos = this.nextPositionMiner(world, target.position);
+            Point nextPos = this.nextPosition(world, target.position());
 
             if (!this.position.equals(nextPos))
             {
@@ -93,20 +103,35 @@ public class MinerFull implements Entity, Schedulable, AnimatedActor{
             return false;
         }
     }
+
     public void executeActivity(WorldModel world, ImageStore imageStore, EventScheduler scheduler)
     {
         Optional<Entity> fullTarget = world.findNearest(this.position,
                 EntityKind.BLACKSMITH);
 
         if (fullTarget.isPresent() &&
-                this.moveToFull(world, fullTarget.get(), scheduler))
+                this.moveTo(world, fullTarget.get(), scheduler))
         {
-            this.transformFull(world, scheduler, imageStore);
+            this.transform(world, scheduler, imageStore);
         }
         else
         {
-            scheduler.scheduleEvent(this, Action.createActivityAction(this, world, imageStore), this.actionPeriod);
+            scheduler.scheduleEvent(this, ActionFactory.createActivityAction(this, world, imageStore), this.actionPeriod);
         }
+    }
+
+
+    private void transform(WorldModel world, EventScheduler scheduler, ImageStore imageStore)
+    {
+        MinerNotFull miner = Create.createMinerNotFull(this.id, this.resourceLimit,
+                this.position, this.actionPeriod, this.animationPeriod,
+                this.images);
+
+        world.removeEntity(this);
+        scheduler.unscheduleAllEvents(this);
+
+        world.addEntity(miner);
+        miner.scheduleActions(scheduler, world, imageStore);
     }
 
 }

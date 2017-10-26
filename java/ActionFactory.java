@@ -1,8 +1,8 @@
 public class ActionFactory {
 
-    private Entity entity;
-    private WorldModel world;
-    private ImageStore imageStore;
+    //private Entity entity;
+    //private WorldModel world;
+    //private ImageStore imageStore;
 
     /*public ActionFactory(Entity entity, WorldModel world,
                          ImageStore imageStore) {
@@ -12,8 +12,12 @@ public class ActionFactory {
     }*/
 
 
-    public static Action createActivityAction(Entity entity, WorldModel world,
+    public static Action createActivityAction(Actor entity, WorldModel world,
                                               ImageStore imageStore) {
-        return new ActivityAction(entity, world, imageStore, 0);
+        return new ActivityAction(entity, world, imageStore);
+    }
+
+    public static Action createAnimationAction(Animated entity, int repeatCount) {
+        return new AnimationAction(entity, null, null, repeatCount);
     }
 }

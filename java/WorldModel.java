@@ -124,16 +124,16 @@ final class WorldModel
     */
     public void addEntity(Entity entity)
     {
-        if (this.withinBounds(entity.getPosition()))
+        if (this.withinBounds(entity.position()))
         {
-            this.setOccupancyCell(entity.getPosition(), entity);
+            this.setOccupancyCell(entity.position(), entity);
             this.entities.add(entity);
         }
     }
 
     public void tryAddEntity(Entity entity)
     {
-        if (this.isOccupied(entity.getPosition()))
+        if (this.isOccupied(entity.position()))
         {
             // arguably the wrong type of exception, but we are not
             // defining our own exceptions yet
@@ -145,7 +145,7 @@ final class WorldModel
 
     public void moveEntity(Entity entity, Point pos)
     {
-        Point oldPos = entity.getPosition();
+        Point oldPos = entity.position();
         if (this.withinBounds(pos) && !pos.equals(oldPos))
         {
             this.setOccupancyCell(oldPos, null);
@@ -169,7 +169,7 @@ final class WorldModel
 
     public void removeEntity(Entity entity)
     {
-        this.removeEntityAt(entity.getPosition());
+        this.removeEntityAt(entity.position());
     }
 
 
@@ -184,11 +184,11 @@ final class WorldModel
         else
         {
             Entity nearest = entities.get(0);
-            int nearestDistance = distanceSquared(nearest.getPosition(),pos);
+            int nearestDistance = distanceSquared(nearest.position(),pos);
 
             for (Entity other : entities)
             {
-                int otherDistance = distanceSquared(other.getPosition(), pos);
+                int otherDistance = distanceSquared(other.position(), pos);
 
                 if (otherDistance < nearestDistance)
                 {

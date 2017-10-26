@@ -110,7 +110,8 @@ public final class VirtualWorld
    private static Background createDefaultBackground(ImageStore imageStore)
    {
       return new Background(DEFAULT_IMAGE_NAME,
-         imageStore.getImageList(DEFAULT_IMAGE_NAME));
+         imageStore.getImageList());
+      //DEFAULT_IMAGE_NAME
    }
 
    private static PImage createImageColored(int width, int height, int color)
@@ -131,7 +132,7 @@ public final class VirtualWorld
       try
       {
          Scanner in = new Scanner(new File(filename));
-         Functions.loadImages(in, imageStore, screen);
+         ImageLoader.loadImages(in, imageStore, screen);
       }
       catch (FileNotFoundException e)
       {
@@ -145,7 +146,7 @@ public final class VirtualWorld
       try
       {
          Scanner in = new Scanner(new File(filename));
-         Functions.load(in, world, imageStore);
+         WorldLoader.load(in, world, imageStore);
       }
       catch (FileNotFoundException e)
       {
@@ -158,7 +159,7 @@ public final class VirtualWorld
    {
       for (Entity entity : world.getEntities())
       {
-         entity.scheduleActions(scheduler, world, imageStore);
+         (entity.scheduleActions(scheduler, world, imageStore));
       }
    }
 

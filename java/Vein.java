@@ -71,22 +71,23 @@ public class Vein implements Entity, Actor, Schedulable{
 
         if (openPt.isPresent())
         {
-            Ore ore = createOre(ORE_ID_PREFIX + this.id,
+            Ore ore = Create.createOre(ORE_ID_PREFIX + this.id,
                     openPt.get(), ORE_CORRUPT_MIN +
                             rand.nextInt(ORE_CORRUPT_MAX - ORE_CORRUPT_MIN),
-                    imageStore.getImageList(Functions.ORE_KEY));
+                    imageStore.getImageList());
+            //ORE_KEY
             world.addEntity(ore);
             ore.scheduleActions(scheduler, world, imageStore);
         }
 
         scheduler.scheduleEvent(this,
-                Action.createActivityAction(this, world, imageStore),
+                ActionFactory.createActivityAction(this, world, imageStore),
                 this.actionPeriod);
     }
 
     public void scheduleActions(EventScheduler scheduler, WorldModel world, ImageStore imageStore)
     {
-        scheduler.scheduleEvent(this, Action.createActivityAction(this, world, imageStore), this.actionPeriod);
+        scheduler.scheduleEvent(this, ActionFactory.createActivityAction(this, world, imageStore), this.actionPeriod);
     }
 
     public Optional<Point> findOpenAround(WorldModel world, Point pos)

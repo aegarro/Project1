@@ -103,8 +103,9 @@ public class Ore_Blob  implements Entity, Schedulable, AnimatedActor{
 
             if (this.moveTo(world, blobTarget.get(), scheduler))
             {
-                Quake quake = createQuake(tgtPos,
-                        imageStore.getImageList(Functions.QUAKE_KEY));
+                Quake quake = (Quake)Create.createQuake(tgtPos,
+                        imageStore.getImageList());
+                //QUAKE_KEY
 
                 world.addEntity(quake);
                 nextPeriod += this.actionPeriod;
@@ -113,7 +114,7 @@ public class Ore_Blob  implements Entity, Schedulable, AnimatedActor{
         }
 
         scheduler.scheduleEvent(this,
-                Action.createActivityAction(this, world, imageStore),
+                ActionFactory.createActivityAction(this, world, imageStore),
                 nextPeriod);
     }
 
@@ -146,9 +147,9 @@ public class Ore_Blob  implements Entity, Schedulable, AnimatedActor{
 
     public void scheduleActions(EventScheduler scheduler, WorldModel world, ImageStore imageStore)
     {
-        scheduler.scheduleEvent(this, Action.createActivityAction(this, world, imageStore),
+        scheduler.scheduleEvent(this, ActionFactory.createActivityAction(this, world, imageStore),
                 this.actionPeriod);
-        scheduler.scheduleEvent(this, Action.createAnimationAction(this, 0), this.getAnimationPeriod());
+        scheduler.scheduleEvent(this, ActionFactory.createAnimationAction(this, 0), this.getAnimationPeriod());
 
     }
     private boolean adjacent(Point p2)

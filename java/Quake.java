@@ -88,8 +88,8 @@ public class Quake implements Entity, AnimatedActor{
 
     public void scheduleActions(EventScheduler scheduler, WorldModel world, ImageStore imageStore)
     {
-        scheduler.scheduleEvent(this, Action.createActivityAction(this, world, imageStore), this.actionPeriod);
-                scheduler.scheduleEvent(this, Action.createAnimationAction(this, QUAKE_ANIMATION_REPEAT_COUNT),
+        scheduler.scheduleEvent(this, ActionFactory.createActivityAction(this, world, imageStore), this.actionPeriod);
+                scheduler.scheduleEvent(this, ActionFactory.createAnimationAction(this, QUAKE_ANIMATION_REPEAT_COUNT),
                         this.getAnimationPeriod());
 
     }
