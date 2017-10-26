@@ -9,27 +9,26 @@ public class Blacksmith {
     private Point position;
     private List<PImage> images;
     private int imageIndex;
-    private int resourceLimit;
-    private int resourceCount;
-    private int actionPeriod;
-    private int animationPeriod;
+    //private int resourceLimit;
+    //private int resourceCount;
+    //private int actionPeriod;
+    //private int animationPeriod;
 
     private static final Random rand = new Random();
 
 
 
     public Blacksmith(String id, Point position,
-                  List<PImage> images, int resourceLimit, int resourceCount,
-                  int actionPeriod, int animationPeriod)
+                  List<PImage> images)
     {
         this.id = id;
         this.position = position;
         this.images = images;
         this.imageIndex = 0;
-        this.resourceLimit = resourceLimit;
-        this.resourceCount = resourceCount;
-        this.actionPeriod = actionPeriod;
-        this.animationPeriod = animationPeriod;
+        //this.resourceLimit = resourceLimit;
+        //this.resourceCount = resourceCount;
+        //this.actionPeriod = actionPeriod;
+        //this.animationPeriod = animationPeriod;
     }
 
     public int getImageIndex(){
@@ -40,7 +39,11 @@ public class Blacksmith {
         return this.images;
     }
 
-    public PImage getCurrentImage(){
+    public PImage getCurrentImage() {
+        return this.images.get(this.imageIndex);
+    }
+
+    /*public PImage getCurrentImage(){
         if (this instanceof Background) {
             return ((Background) this).images.get(((Background) this).imageIndex);
         }
@@ -49,11 +52,11 @@ public class Blacksmith {
         }
         else {
             throw new UnsupportedOperationException(String.format("getCurrentImage not " +
-                    "supportedfor Blacksmith"));
+                    "supported for Blacksmith"));
         }
-    }
+    }*/
 
-    public Point getPosition(){
+    public Point position(){
         return this.position;
     }
 
@@ -62,25 +65,4 @@ public class Blacksmith {
     }
 
 
-    public  void nextImage()
-    {
-        this.imageIndex = (this.imageIndex + 1) % this.images.size();
-    }
-
-    public int getAnimationPeriod() {
-        throw new UnsupportedOperationException(
-                String.format("getAnimationPeriod not supported for Blacksmith"));
-        }
-
-
-    public static Blacksmith createBlacksmith(String id, Point position,
-                                          List<PImage> images)
-    {
-        return new Blacksmith(id, position, images, 0, 0, 0, 0);
-    }
-
-    public String executeActivity(WorldModel world, ImageStore imageStore, EventScheduler scheduler){
-        throw new UnsupportedOperationException(
-                String.format("executeActivityAction not supported for Blacksmith"));
-    }
 }

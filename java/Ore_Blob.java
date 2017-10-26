@@ -3,40 +3,34 @@ import java.util.Optional;
 import java.util.Random;
 
 import processing.core.PImage;
-public class Ore_Blob {
+public class Ore_Blob  implements Entity, Schedulable, AnimatedActor{
     private String id;
     private Point position;
     private List<PImage> images;
     private int imageIndex;
-    private int resourceLimit;
-    private int resourceCount;
     private int actionPeriod;
     private int animationPeriod;
 
-    private static final Random rand = new Random();
-
-    private static final String BLOB_ID_SUFFIX = " -- blob";
+    /*private static final String BLOB_ID_SUFFIX = " -- blob";
     private static final int BLOB_PERIOD_SCALE = 4;
     private static final int BLOB_ANIMATION_MIN = 50;
-    private static final int BLOB_ANIMATION_MAX = 150;
+    private static final int BLOB_ANIMATION_MAX = 150;*/
 
-    public Ore_Blob(String id, Point position,
-                  List<PImage> images, int resourceLimit, int resourceCount,
-                  int actionPeriod, int animationPeriod)
+    public Ore_Blob(String id, Point position, List<PImage> images, int actionPeriod, int animationPeriod)
     {
         this.id = id;
         this.position = position;
         this.images = images;
         this.imageIndex = 0;
-        this.resourceLimit = resourceLimit;
-        this.resourceCount = resourceCount;
         this.actionPeriod = actionPeriod;
         this.animationPeriod = animationPeriod;
-
-
     }
 
-    public PImage getCurrentImage(){
+    public PImage getCurrentImage() {
+        return this.images.get(this.imageIndex);
+    }
+
+    /*public PImage getCurrentImage(){
         if (this instanceof Background) {
             return ((Background)this).images.get(((Background)this).imageIndex);
         }
@@ -47,17 +41,10 @@ public class Ore_Blob {
             throw new UnsupportedOperationException(String.format("getCurrentImage not " +
                     "supported for Ore_Blob"));
         }
-    }
+    }*/
 
-    public int getImageIndex(){
-        return this.imageIndex;
-    }
 
-    public List<PImage> getImages(){
-        return this.images;
-    }
-
-    public Point getPosition(){
+    public Point position(){
         return this.position;
     }
 
@@ -66,7 +53,7 @@ public class Ore_Blob {
     }
 
 
-    public Point nextPositionOreBlob(WorldModel world, Point destPos)
+    public Point nextPosition(WorldModel world, Point destPos)
     {
         int horiz = Integer.signum(destPos.x - position.x);
         Point newPos = new Point(position.x + horiz,
@@ -98,6 +85,7 @@ public class Ore_Blob {
     }
 
     public int getAnimationPeriod()
+
     {
         return this.animationPeriod;
     }
@@ -111,11 +99,11 @@ public class Ore_Blob {
 
         if (blobTarget.isPresent())
         {
-            Point tgtPos = blobTarget.getPosition();
+            Point tgtPos = blobTarget.position();
 
-            if (this.moveToOreBlob(world, blobTarget.get(), scheduler))
+            if (this.moveTo(world, blobTarget.get(), scheduler))
             {
-                Entity quake = createQuake(tgtPos,
+                Quake quake = createQuake(tgtPos,
                         imageStore.getImageList(Functions.QUAKE_KEY));
 
                 world.addEntity(quake);
@@ -130,10 +118,9 @@ public class Ore_Blob {
     }
 
 
-
-    private boolean moveToOreBlob(WorldModel world, Entity target, EventScheduler scheduler)
+    private boolean moveTo(WorldModel world, Entity target, EventScheduler scheduler)
     {
-        if (this.position.adjacent(target.getPosition()))
+        if (this.adjacent(target.position()))
         {
             world.removeEntity(target);
             scheduler.unscheduleAllEvents(target);
@@ -141,7 +128,7 @@ public class Ore_Blob {
         }
         else
         {
-            Point nextPos = this.nextPositionOreBlob(world,target.getPosition());
+            Point nextPos = this.nextPosition(world,target.position());
 
             if (!this.position.equals(nextPos))
             {
@@ -164,14 +151,10 @@ public class Ore_Blob {
         scheduler.scheduleEvent(this, Action.createAnimationAction(this, 0), this.getAnimationPeriod());
 
     }
-
-
-
-    public static Ore_Blob createOreBlob(String id, Point position,
-                                       int actionPeriod, int animationPeriod, List<PImage> images)
+    private boolean adjacent(Point p2)
     {
-        return new Ore_Blob(id, position, images,
-                0, 0, actionPeriod, animationPeriod);
+        return (this.position.x == p2.x && Math.abs(this.position.y - p2.y) == 1) ||
+                (this.position.y == p2.y && Math.abs(this.position.x - p2.x) == 1);
     }
 
 

@@ -8,10 +8,10 @@ public class Obstacle implements Entity{
     private Point position;
     private List<PImage> images;
     private int imageIndex;
-    private int resourceLimit;
-    private int resourceCount;
-    private int actionPeriod;
-    private int animationPeriod;
+    //private int resourceLimit;
+    //private int resourceCount;
+    //private int actionPeriod;
+    //private int animationPeriod;
 
     private static final Random rand = new Random();
 
@@ -40,7 +40,7 @@ public class Obstacle implements Entity{
         return this.images;
     }
 
-    public Point getPosition(){
+    public Point position(){
         return this.position;
     }
 
@@ -48,35 +48,26 @@ public class Obstacle implements Entity{
         this.position = position;
     }
 
-
     public  void nextImage()
     {
         this.imageIndex = (this.imageIndex + 1) % this.images.size();
     }
 
-    public String getAnimationPeriod()
-    {
-        throw new UnsupportedOperationException(String.format("getAnimationPeriod not supported for Obstacle"));
-        }
 
-
-
-    public void scheduleActions(EventScheduler scheduler, WorldModel world, ImageStore imageStore)
-    {
-        }
-
-
-    public static Obstacle createObstacle(String id, Point position,
-                                        List<PImage> images)
-    {
-        return new Obstacle(id, position, images,
-                0, 0, 0, 0);
+    public PImage getCurrentImage() {
+        return this.images.get(this.imageIndex);
     }
-
-    public String executeActivity(WorldModel world, ImageStore imageStore, EventScheduler scheduler){
-        throw new UnsupportedOperationException(
-                String.format("executeActivityAction not supported for Obstacle"));
-    }
-
+    /*
+        if (this instanceof Background) {
+            return ((Background) this).images.get(((Background) this).imageIndex);
+        }
+        else if (this instanceof Entity) {
+            return ((Entity) this).images.get(((Entity) this).imageIndex);
+        }
+        else {
+            throw new UnsupportedOperationException(String.format("getCurrentImage not " +
+                    "supportedfor Obstacle"));
+        }
+    }*/
 
 }

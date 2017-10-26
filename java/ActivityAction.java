@@ -1,15 +1,15 @@
-public class Activity implements Action{
-    private Entity entity;
+public class ActivityAction implements Action{
+    private Actor entity;
     private WorldModel world;
     private ImageStore imageStore;
-    private int repeatCount;
+    //private int repeatCount;
 
-    public Activity(Entity entity, WorldModel world,
-                    ImageStore imageStore, int repeatCount){
+    public ActivityAction(Actor entity, WorldModel world,
+                    ImageStore imageStore){
         this.entity = entity;
         this.world = world;
         this.imageStore = imageStore;
-        this.repeatCount = repeatCount;
+        //this.repeatCount = repeatCount;
     }
 
     public void executeAction(EventScheduler scheduler){
@@ -17,10 +17,10 @@ public class Activity implements Action{
     }
 
 
-    public static Activity createAction(Entity entity, WorldModel world,
+    /*public static Activity createAction(Entity entity, WorldModel world,
                                               ImageStore imageStore)
     {
         return new Activity(entity, world, imageStore, 0);
-    }
+    }*/
 
 }

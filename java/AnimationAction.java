@@ -1,10 +1,10 @@
-public class Animation implements Action{
+public class AnimationAction implements Action{
     private Entity entity;
     private WorldModel world;
     private ImageStore imageStore;
     private int repeatCount;
 
-    public Animation(Entity entity, WorldModel world,
+    public AnimationAction(Entity entity, WorldModel world,
                      ImageStore imageStore, int repeatCount){
         this.entity = entity;
         this.world = world;
