@@ -1,3 +1,4 @@
+import java.awt.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -7,7 +8,6 @@ public class Ore implements Entity, Actor, Schedulable {
     private String id;
     private Point position;
     private List<PImage> images;
-    private int imageIndex;
     //private int resourceLimit;
     //private int resourceCount;
     private int actionPeriod;
@@ -24,7 +24,6 @@ public class Ore implements Entity, Actor, Schedulable {
         this.id = id;
         this.position = position;
         this.images = images;
-        this.imageIndex = 0;
         //this.resourceLimit = resourceLimit;
         //this.resourceCount = resourceCount;
         this.actionPeriod = actionPeriod;
@@ -32,7 +31,7 @@ public class Ore implements Entity, Actor, Schedulable {
     }
 
     public PImage getCurrentImage() {
-        return this.images.get(this.imageIndex);
+        return this.images.get(0);
     }
 
     /*public PImage getCurrentImage() {
@@ -48,9 +47,6 @@ public class Ore implements Entity, Actor, Schedulable {
         }
     }*/
 
-    public int getImageIndex() {
-        return this.imageIndex;
-    }
 
     public List<PImage> getImages() {
         return this.images;
@@ -71,14 +67,14 @@ public class Ore implements Entity, Actor, Schedulable {
         world.removeEntity(this);
         scheduler.unscheduleAllEvents(this);
 
-        Ore_Blob blob = Create.createOreBlob(this.id + BLOB_ID_SUFFIX,
+        Entity blob = Create.createOreBlob(this.id + BLOB_ID_SUFFIX,
                 pos, this.actionPeriod / BLOB_PERIOD_SCALE,
                 BLOB_ANIMATION_MIN +
                         rand.nextInt(BLOB_ANIMATION_MAX - BLOB_ANIMATION_MIN),
-                imageStore.getImageList());
+                imageStore.getImageList(WorldLoader.BLOB_KEY));
                 //BLOB_KEY
         world.addEntity(blob);
-        blob.scheduleActions(scheduler, world, imageStore);
+        ((Schedulable)blob).scheduleActions(scheduler, world, imageStore);
     }
 
     public void scheduleActions(EventScheduler scheduler, WorldModel world, ImageStore imageStore) {

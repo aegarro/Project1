@@ -1,6 +1,8 @@
 import processing.core.PApplet;
 import processing.core.PImage;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +34,8 @@ public class ImageLoader {
             lineNumber++;
         }
     }
+
+
 
     private static void processImageLine(Map<String, List<PImage>> images,
                                          String line, PApplet screen)

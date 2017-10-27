@@ -71,13 +71,13 @@ public class Vein implements Entity, Actor, Schedulable{
 
         if (openPt.isPresent())
         {
-            Ore ore = Create.createOre(ORE_ID_PREFIX + this.id,
+            Entity ore = Create.createOre(ORE_ID_PREFIX + this.id,
                     openPt.get(), ORE_CORRUPT_MIN +
                             rand.nextInt(ORE_CORRUPT_MAX - ORE_CORRUPT_MIN),
-                    imageStore.getImageList());
+                    imageStore.getImageList(WorldLoader.ORE_KEY));
             //ORE_KEY
             world.addEntity(ore);
-            ore.scheduleActions(scheduler, world, imageStore);
+            ((Schedulable)ore).scheduleActions(scheduler, world, imageStore);
         }
 
         scheduler.scheduleEvent(this,

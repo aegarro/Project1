@@ -3,7 +3,7 @@ import java.util.Optional;
 import java.util.Random;
 
 import processing.core.PImage;
-public class Quake implements Entity, AnimatedActor{
+public class Quake implements Entity, AnimatedActor, Schedulable{
     private String id;
     private Point position;
     private List<PImage> images;

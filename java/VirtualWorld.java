@@ -110,7 +110,7 @@ public final class VirtualWorld
    private static Background createDefaultBackground(ImageStore imageStore)
    {
       return new Background(DEFAULT_IMAGE_NAME,
-         imageStore.getImageList());
+         imageStore.getImageList(DEFAULT_IMAGE_NAME));
       //DEFAULT_IMAGE_NAME
    }
 
@@ -126,7 +126,7 @@ public final class VirtualWorld
       return img;
    }
 
-   private static void loadImages(String filename, ImageStore imageStore,
+   /*private static void loadImages(String filename, ImageStore imageStore,
       PApplet screen)
    {
       try
@@ -138,7 +138,7 @@ public final class VirtualWorld
       {
          System.err.println(e.getMessage());
       }
-   }
+   }*/
 
    private static void loadWorld(WorldModel world, String filename,
       ImageStore imageStore)
@@ -159,7 +159,9 @@ public final class VirtualWorld
    {
       for (Entity entity : world.getEntities())
       {
-         entity.scheduleActions(scheduler, world, imageStore);
+         if (entity instanceof Schedulable) {
+            ((Schedulable)entity).scheduleActions(scheduler, world, imageStore);
+         }
       }
    }
 
@@ -190,5 +192,17 @@ public final class VirtualWorld
       PApplet.main(VirtualWorld.class);
    }
 
-
+   public static void loadImages(String filename, ImageStore imageStore,
+                                 PApplet screen)
+   {
+      try
+      {
+         Scanner in = new Scanner(new File(filename));
+         ImageLoader.loadImages(in, imageStore, screen);
+      }
+      catch (FileNotFoundException e)
+      {
+         System.err.println(e.getMessage());
+      }
+   }
 }

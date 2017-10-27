@@ -3,7 +3,7 @@ import java.util.Optional;
 import java.util.Random;
 import processing.core.PImage;
 
-public class Blacksmith {
+public class Blacksmith implements Entity{
 
     private String id;
     private Point position;

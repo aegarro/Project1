@@ -110,7 +110,7 @@ public class WorldLoader {
                     Integer.parseInt(properties[BGND_ROW]));
             String id = properties[BGND_ID];
             world.setBackground(pt,
-                    new Background(id, imageStore.getImageList()));
+                    new Background(id, imageStore.getImageList(id)));
         }
 
         return properties.length == BGND_NUM_PROPERTIES;
@@ -122,12 +122,12 @@ public class WorldLoader {
         {
             Point pt = new Point(Integer.parseInt(properties[MINER_COL]),
                     Integer.parseInt(properties[MINER_ROW]));
-            MinerNotFull entity = Create.createMinerNotFull(properties[MINER_ID],
+            Entity entity = Create.createMinerNotFull(properties[MINER_ID],
                     Integer.parseInt(properties[MINER_LIMIT]),
                     pt,
                     Integer.parseInt(properties[MINER_ACTION_PERIOD]),
                     Integer.parseInt(properties[MINER_ANIMATION_PERIOD]),
-                    imageStore.getImageList());
+                    imageStore.getImageList(MINER_KEY));
             world.tryAddEntity(entity);
         }
 
@@ -141,8 +141,8 @@ public class WorldLoader {
             Point pt = new Point(
                     Integer.parseInt(properties[OBSTACLE_COL]),
                     Integer.parseInt(properties[OBSTACLE_ROW]));
-            Obstacle entity = Create.createObstacle(properties[OBSTACLE_ID],
-                    pt, imageStore.getImageList());
+            Entity entity = Create.createObstacle(properties[OBSTACLE_ID],
+                    pt, imageStore.getImageList(OBSTACLE_KEY));
             world.tryAddEntity(entity);
         }
 
@@ -155,9 +155,9 @@ public class WorldLoader {
         {
             Point pt = new Point(Integer.parseInt(properties[ORE_COL]),
                     Integer.parseInt(properties[ORE_ROW]));
-            Ore entity = Create.createOre(properties[ORE_ID],
+            Entity entity = Create.createOre(properties[ORE_ID],
                     pt, Integer.parseInt(properties[ORE_ACTION_PERIOD]),
-                    imageStore.getImageList());
+                    imageStore.getImageList(ORE_KEY));
             //ORE_KEY
             world.tryAddEntity(entity);
         }
@@ -171,8 +171,8 @@ public class WorldLoader {
         {
             Point pt = new Point(Integer.parseInt(properties[SMITH_COL]),
                     Integer.parseInt(properties[SMITH_ROW]));
-            Entity entity = (Entity)Create.createBlacksmith(properties[SMITH_ID],
-                    pt, imageStore.getImageList());
+            Entity entity = Create.createBlacksmith(properties[SMITH_ID],
+                    pt, imageStore.getImageList(SMITH_KEY));
             //SMITH_KEY
             world.tryAddEntity(entity);
         }
@@ -189,12 +189,14 @@ public class WorldLoader {
             Entity entity = Create.createVein(properties[VEIN_ID],
                     pt,
                     Integer.parseInt(properties[VEIN_ACTION_PERIOD]),
-                    imageStore.getImageList());
+                    imageStore.getImageList(VEIN_KEY));
             world.tryAddEntity(entity);
         }
 
         return properties.length == VEIN_NUM_PROPERTIES;
     }
+
+
 
 
 

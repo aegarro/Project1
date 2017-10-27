@@ -107,7 +107,7 @@ public class MinerNotFull implements Entity, Schedulable, AnimatedActor{
     public void executeActivity(WorldModel world, ImageStore imageStore, EventScheduler scheduler)
     {
         Optional<Entity> notFullTarget = world.findNearest(this.position,
-                EntityKind.ORE);
+                Ore.class);
 
         if (!notFullTarget.isPresent() ||
                 !this.moveTo(world, notFullTarget.get(), scheduler) ||
@@ -123,7 +123,7 @@ public class MinerNotFull implements Entity, Schedulable, AnimatedActor{
     {
         if (this.resourceCount >= this.resourceLimit)
         {
-            MinerFull miner = Create.createMinerFull(this.id, this.resourceLimit,
+            Entity miner = Create.createMinerFull(this.id, this.resourceLimit,
                     this.position, this.actionPeriod, this.animationPeriod,
                     this.images);
 
@@ -131,7 +131,7 @@ public class MinerNotFull implements Entity, Schedulable, AnimatedActor{
             scheduler.unscheduleAllEvents(this);
 
             world.addEntity(miner);
-            miner.scheduleActions(scheduler, world, imageStore);
+            ((Schedulable)miner).scheduleActions(scheduler, world, imageStore);
 
             return true;
         }

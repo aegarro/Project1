@@ -107,7 +107,7 @@ public class MinerFull implements Entity, Schedulable, AnimatedActor{
     public void executeActivity(WorldModel world, ImageStore imageStore, EventScheduler scheduler)
     {
         Optional<Entity> fullTarget = world.findNearest(this.position,
-                EntityKind.BLACKSMITH);
+                Blacksmith.class);
 
         if (fullTarget.isPresent() &&
                 this.moveTo(world, fullTarget.get(), scheduler))
@@ -123,7 +123,7 @@ public class MinerFull implements Entity, Schedulable, AnimatedActor{
 
     private void transform(WorldModel world, EventScheduler scheduler, ImageStore imageStore)
     {
-        MinerNotFull miner = Create.createMinerNotFull(this.id, this.resourceLimit,
+        Entity miner = Create.createMinerNotFull(this.id, this.resourceLimit,
                 this.position, this.actionPeriod, this.animationPeriod,
                 this.images);
 
@@ -131,7 +131,7 @@ public class MinerFull implements Entity, Schedulable, AnimatedActor{
         scheduler.unscheduleAllEvents(this);
 
         world.addEntity(miner);
-        miner.scheduleActions(scheduler, world, imageStore);
+        ((Schedulable)miner).scheduleActions(scheduler, world, imageStore);
     }
 
 }

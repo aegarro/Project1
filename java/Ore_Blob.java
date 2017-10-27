@@ -11,10 +11,6 @@ public class Ore_Blob  implements Entity, Schedulable, AnimatedActor{
     private int actionPeriod;
     private int animationPeriod;
 
-    /*private static final String BLOB_ID_SUFFIX = " -- blob";
-    private static final int BLOB_PERIOD_SCALE = 4;
-    private static final int BLOB_ANIMATION_MIN = 50;
-    private static final int BLOB_ANIMATION_MAX = 150;*/
 
     public Ore_Blob(String id, Point position, List<PImage> images, int actionPeriod, int animationPeriod)
     {
@@ -29,19 +25,6 @@ public class Ore_Blob  implements Entity, Schedulable, AnimatedActor{
     public PImage getCurrentImage() {
         return this.images.get(this.imageIndex);
     }
-
-    /*public PImage getCurrentImage(){
-        if (this instanceof Background) {
-            return ((Background)this).images.get(((Background)this).imageIndex);
-        }
-        else if (this instanceof Entity) {
-            return ((Entity)this).images.get(((Entity) this).imageIndex);
-        }
-        else {
-            throw new UnsupportedOperationException(String.format("getCurrentImage not " +
-                    "supported for Ore_Blob"));
-        }
-    }*/
 
 
     public Point position(){
@@ -62,14 +45,14 @@ public class Ore_Blob  implements Entity, Schedulable, AnimatedActor{
         Optional<Entity> occupant = world.getOccupant(newPos);
 
         if (horiz == 0 ||
-                (occupant.isPresent() && !(occupant.get().kind == EntityKind.ORE)))
+                (occupant.isPresent() && !((occupant.get()) instanceof Ore)))
         {
             int vert = Integer.signum(destPos.y - position.y);
             newPos = new Point(position.x, position.y + vert);
             occupant = world.getOccupant(newPos);
 
             if (vert == 0 ||
-                    (occupant.isPresent() && !(occupant.get().kind == EntityKind.ORE)))
+                    (occupant.isPresent() && !((occupant.get()) instanceof Ore)))
             {
                 newPos = position;
             }
@@ -94,17 +77,17 @@ public class Ore_Blob  implements Entity, Schedulable, AnimatedActor{
     public void executeActivity(WorldModel world, ImageStore imageStore, EventScheduler scheduler)
     {
         Optional<Entity> blobTarget = world.findNearest(
-                this.position, EntityKind.VEIN);
+                this.position, Vein.class);
         long nextPeriod = this.actionPeriod;
 
         if (blobTarget.isPresent())
         {
-            Point tgtPos = blobTarget.position();
+            Point tgtPos = blobTarget.get().position();
 
             if (this.moveTo(world, blobTarget.get(), scheduler))
             {
                 Quake quake = (Quake)Create.createQuake(tgtPos,
-                        imageStore.getImageList());
+                        imageStore.getImageList(WorldLoader.QUAKE_KEY));
                 //QUAKE_KEY
 
                 world.addEntity(quake);
