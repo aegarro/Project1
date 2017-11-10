@@ -3,67 +3,40 @@ import java.util.Optional;
 
 import java.util.List;
 
-public class MinerNotFull implements Entity, Schedulable, AnimatedActor{
+public class MinerNotFull extends AbstractMoveable {
     private String id;
-    private Point position;
-    private List<PImage> images;
-    private int imageIndex;
     private int actionPeriod;
-    private int animationPeriod;
     private int resourceLimit;
     private int resourceCount;
 
     public MinerNotFull(String id, int resourceLimit, Point position, int actionPeriod,
                               int animationPeriod, List<PImage> images){
+        super(position, images, 0, animationPeriod);
         this.id = id;
         this.resourceLimit = resourceLimit;
-        this.position = position;
         this.actionPeriod = actionPeriod;
-        this.animationPeriod = animationPeriod;
-        this.images = images;
     }
 
-    public PImage getCurrentImage() {
-        return this.images.get(this.imageIndex);
-    }
 
-    public Point position(){
-        return this.position;
-    }
-
-    private Point nextPosition(WorldModel world, Point destPos)
+    public Point nextPosition(WorldModel world, Point destPos)
     {
-        int horiz = Integer.signum(destPos.x - this.position.x);
-        Point newPos = new Point(this.position.x + horiz,
-                this.position.y);
+        int horiz = Integer.signum(destPos.x - this.position().x);
+        Point newPos = new Point(this.position().x + horiz,
+                this.position().y);
 
         if (horiz == 0 || world.isOccupied(newPos))
         {
-            int vert = Integer.signum(destPos.y - this.position.y);
-            newPos = new Point(this.position.x,
-                    this.position.y + vert);
+            int vert = Integer.signum(destPos.y - this.position().y);
+            newPos = new Point(this.position().x,
+                    this.position().y + vert);
 
             if (vert == 0 || world.isOccupied(newPos))
             {
-                newPos = this.position;
+                newPos = this.position();
             }
         }
 
         return newPos;
-    }
-
-    public void setPosition(Point position) {
-        this.position = position;
-    }
-
-
-    public int getAnimationPeriod() {
-        return this.animationPeriod;
-    }
-
-    public  void nextImage()
-    {
-        this.imageIndex = (this.imageIndex + 1) % this.images.size();
     }
 
 
@@ -75,13 +48,13 @@ public class MinerNotFull implements Entity, Schedulable, AnimatedActor{
 
     private boolean adjacent(Point p2)
     {
-        return (this.position.x == p2.x && Math.abs(this.position.y - p2.y) == 1) ||
-                (this.position.y == p2.y && Math.abs(this.position.x - p2.x) == 1);
+        return (this.position().x == p2.x && Math.abs(this.position().y - p2.y) == 1) ||
+                (this.position().y == p2.y && Math.abs(this.position().x - p2.x) == 1);
     }
 
 
 
-    private boolean moveTo(WorldModel world, Entity target, EventScheduler scheduler) {
+    public boolean moveTo(WorldModel world, Entity target, EventScheduler scheduler) {
         if (this.adjacent(target.position())) {
             this.resourceCount += 1;
             world.removeEntity(target);
@@ -91,7 +64,7 @@ public class MinerNotFull implements Entity, Schedulable, AnimatedActor{
         } else {
             Point nextPos = this.nextPosition(world, target.position());
 
-            if (!this.position.equals(nextPos)) {
+            if (!this.position().equals(nextPos)) {
                 Optional<Entity> occupant = world.getOccupant(nextPos);
                 if (occupant.isPresent()) {
                     scheduler.unscheduleAllEvents(occupant.get());
@@ -106,7 +79,7 @@ public class MinerNotFull implements Entity, Schedulable, AnimatedActor{
 
     public void executeActivity(WorldModel world, ImageStore imageStore, EventScheduler scheduler)
     {
-        Optional<Entity> notFullTarget = world.findNearest(this.position,
+        Optional<Entity> notFullTarget = world.findNearest(this.position(),
                 Ore.class);
 
         if (!notFullTarget.isPresent() ||
@@ -124,8 +97,8 @@ public class MinerNotFull implements Entity, Schedulable, AnimatedActor{
         if (this.resourceCount >= this.resourceLimit)
         {
             Entity miner = Create.createMinerFull(this.id, this.resourceLimit,
-                    this.position, this.actionPeriod, this.animationPeriod,
-                    this.images);
+                    this.position(), this.actionPeriod, this.getAnimationPeriod(),
+                    this.getImage());
 
             world.removeEntity(this);
             scheduler.unscheduleAllEvents(this);

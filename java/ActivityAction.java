@@ -1,10 +1,10 @@
 public class ActivityAction implements Action{
-    private Actor entity;
+    private AbstractSchedulable entity;
     private WorldModel world;
     private ImageStore imageStore;
     //private int repeatCount;
 
-    public ActivityAction(Actor entity, WorldModel world,
+    public ActivityAction(AbstractSchedulable entity, WorldModel world,
                     ImageStore imageStore){
         this.entity = entity;
         this.world = world;

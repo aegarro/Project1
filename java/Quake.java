@@ -3,80 +3,22 @@ import java.util.Optional;
 import java.util.Random;
 
 import processing.core.PImage;
-public class Quake implements Entity, AnimatedActor, Schedulable{
+public class Quake extends AbstractAnimation{
     private String id;
-    private Point position;
-    private List<PImage> images;
-    private int imageIndex;
-    //private int resourceLimit;
-    //private int resourceCount;
-    private int actionPeriod;
-    private int animationPeriod;
-
-    //private static final Random rand = new Random();
-
     private static final int QUAKE_ANIMATION_REPEAT_COUNT = 10;
     private static final String QUAKE_ID = "quake";
+    private int actionPeriod = 1100;
     //private static final int QUAKE_ACTION_PERIOD = 1100;
     //private static final int QUAKE_ANIMATION_PERIOD = 100;
 
 
     public Quake(String id, Point position, List<PImage> images, int actionPeriod, int animationPeriod)
     {
+        super(position, images, 0, animationPeriod);
         this.id = id;
-        this.position = position;
-        this.images = images;
-        this.imageIndex = 0;
-        this.actionPeriod = actionPeriod;
-        this.animationPeriod = animationPeriod;
+        this.actionPeriod = 1100;
     }
 
-    public int getImageIndex(){
-
-        return this.imageIndex;
-    }
-
-    public List<PImage> getImages(){
-
-        return this.images;
-    }
-
-    public Point position(){
-
-        return this.position;
-    }
-
-    public PImage getCurrentImage() {
-        return this.images.get(this.imageIndex);
-    }
-
-    /*public PImage getCurrentImage(){
-        if (this instanceof Background) {
-            return ((Background)this).images.get(((Background)this).imageIndex);
-        }
-        else if (this instanceof Entity) {
-            return ((Entity)this).images.get(((Entity) this).imageIndex);
-        }
-        else {
-            throw new UnsupportedOperationException(String.format("getCurrentImage not " +
-                    "supported for Quake"));
-        }
-    }*/
-
-    public void setPosition(Point position) {
-        this.position = position;
-    }
-
-
-    public void nextImage()
-    {
-        this.imageIndex = (this.imageIndex + 1) % this.images.size();
-    }
-
-    public int getAnimationPeriod()
-    {
-        return this.animationPeriod;
-    }
 
 
     public void executeActivity(WorldModel world, ImageStore imageStore, EventScheduler scheduler)
@@ -89,7 +31,7 @@ public class Quake implements Entity, AnimatedActor, Schedulable{
     public void scheduleActions(EventScheduler scheduler, WorldModel world, ImageStore imageStore)
     {
         scheduler.scheduleEvent(this, ActionFactory.createActivityAction(this, world, imageStore), this.actionPeriod);
-                scheduler.scheduleEvent(this, ActionFactory.createAnimationAction(this, QUAKE_ANIMATION_REPEAT_COUNT),
+        scheduler.scheduleEvent(this, ActionFactory.createAnimationAction(this, QUAKE_ANIMATION_REPEAT_COUNT),
                         this.getAnimationPeriod());
 
     }

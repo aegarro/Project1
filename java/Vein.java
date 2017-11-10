@@ -3,11 +3,8 @@ import java.util.Optional;
 import java.util.Random;
 
 import processing.core.PImage;
-public class Vein implements Entity, Actor, Schedulable{
+public class Vein extends AbstractSchedulable{
     private String id;
-    private Point position;
-    private List<PImage> images;
-    private int imageIndex;
     private int actionPeriod;
     private static final String ORE_ID_PREFIX = "ore -- ";
     private static final int ORE_CORRUPT_MIN = 20000;
@@ -18,56 +15,15 @@ public class Vein implements Entity, Actor, Schedulable{
     public Vein(String id, Point position,
                   List<PImage> images, int actionPeriod)
     {
+        super(position, images, 0);
         this.id = id;
-        this.position = position;
-        this.images = images;
-        this.imageIndex = 0;
         this.actionPeriod = actionPeriod;
     }
-
-    public PImage getCurrentImage() {
-        return this.images.get(this.imageIndex);
-    }
-
-    /*public PImage getCurrentImage(){
-        if (this instanceof Background) {
-            return ((Background)this).images.get(((Background)this).imageIndex);
-        }
-        else if (this instanceof Entity) {
-            return ((Entity)this).images.get(((Entity)this).imageIndex);
-        }
-        else {
-            throw new UnsupportedOperationException(String.format("getCurrentImage not " +
-                    "supported for Vein"));
-        }
-    }*/
-
-    public int getImageIndex(){
-        return this.imageIndex;
-    }
-
-    /*public List<PImage> getImages(){
-        return this.images;
-    }*/
-
-    public Point position(){
-        return this.position;
-    }
-
-    public void setPosition(Point position) {
-        this.position = position;
-    }
-
-    /*public void executeActivity(WorldModel world, ImageStore imageStore, EventScheduler scheduler)
-    {
-        scheduler.unscheduleAllEvents(this);
-        world.removeEntity(this);
-    }*/
 
 
     public void executeActivity(WorldModel world, ImageStore imageStore, EventScheduler scheduler)
     {
-        Optional<Point> openPt = findOpenAround(world, this.position);
+        Optional<Point> openPt = findOpenAround(world, this.position());
 
         if (openPt.isPresent())
         {

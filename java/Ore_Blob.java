@@ -3,58 +3,38 @@ import java.util.Optional;
 import java.util.Random;
 
 import processing.core.PImage;
-public class Ore_Blob  implements Entity, Schedulable, AnimatedActor{
+public class Ore_Blob extends AbstractMoveable{
     private String id;
-    private Point position;
-    private List<PImage> images;
-    private int imageIndex;
     private int actionPeriod;
-    private int animationPeriod;
 
 
     public Ore_Blob(String id, Point position, List<PImage> images, int actionPeriod, int animationPeriod)
     {
+        super(position, images, 0, animationPeriod);
         this.id = id;
-        this.position = position;
-        this.images = images;
-        this.imageIndex = 0;
         this.actionPeriod = actionPeriod;
-        this.animationPeriod = animationPeriod;
-    }
-
-    public PImage getCurrentImage() {
-        return this.images.get(this.imageIndex);
-    }
-
-
-    public Point position(){
-        return this.position;
-    }
-
-    public void setPosition(Point position) {
-        this.position = position;
     }
 
 
     public Point nextPosition(WorldModel world, Point destPos)
     {
-        int horiz = Integer.signum(destPos.x - position.x);
-        Point newPos = new Point(position.x + horiz,
-                position.y);
+        int horiz = Integer.signum(destPos.x - position().x);
+        Point newPos = new Point(position().x + horiz,
+                position().y);
 
         Optional<Entity> occupant = world.getOccupant(newPos);
 
         if (horiz == 0 ||
                 (occupant.isPresent() && !((occupant.get()) instanceof Ore)))
         {
-            int vert = Integer.signum(destPos.y - position.y);
-            newPos = new Point(position.x, position.y + vert);
+            int vert = Integer.signum(destPos.y - position().y);
+            newPos = new Point(position().x, position().y + vert);
             occupant = world.getOccupant(newPos);
 
             if (vert == 0 ||
                     (occupant.isPresent() && !((occupant.get()) instanceof Ore)))
             {
-                newPos = position;
+                newPos = position();
             }
         }
 
@@ -62,22 +42,10 @@ public class Ore_Blob  implements Entity, Schedulable, AnimatedActor{
     }
 
 
-    public  void nextImage()
-    {
-        this.imageIndex = (this.imageIndex + 1) % this.images.size();
-    }
-
-    public int getAnimationPeriod()
-
-    {
-        return this.animationPeriod;
-    }
-
-
     public void executeActivity(WorldModel world, ImageStore imageStore, EventScheduler scheduler)
     {
         Optional<Entity> blobTarget = world.findNearest(
-                this.position, Vein.class);
+                this.position(), Vein.class);
         long nextPeriod = this.actionPeriod;
 
         if (blobTarget.isPresent())
@@ -86,13 +54,12 @@ public class Ore_Blob  implements Entity, Schedulable, AnimatedActor{
 
             if (this.moveTo(world, blobTarget.get(), scheduler))
             {
-                Quake quake = (Quake)Create.createQuake(tgtPos,
-                        imageStore.getImageList(WorldLoader.QUAKE_KEY));
-                //QUAKE_KEY
+                Entity quake = (Quake)(Create.createQuake(tgtPos,
+                        imageStore.getImageList(WorldLoader.QUAKE_KEY)));
 
                 world.addEntity(quake);
                 nextPeriod += this.actionPeriod;
-                quake.scheduleActions(scheduler, world, imageStore);
+                ((Quake)quake).scheduleActions(scheduler, world, imageStore);
             }
         }
 
@@ -102,7 +69,7 @@ public class Ore_Blob  implements Entity, Schedulable, AnimatedActor{
     }
 
 
-    private boolean moveTo(WorldModel world, Entity target, EventScheduler scheduler)
+    public boolean moveTo(WorldModel world, Entity target, EventScheduler scheduler)
     {
         if (this.adjacent(target.position()))
         {
@@ -114,7 +81,7 @@ public class Ore_Blob  implements Entity, Schedulable, AnimatedActor{
         {
             Point nextPos = this.nextPosition(world,target.position());
 
-            if (!this.position.equals(nextPos))
+            if (!this.position().equals(nextPos))
             {
                 Optional<Entity> occupant = world.getOccupant(nextPos);
                 if (occupant.isPresent())
@@ -137,8 +104,8 @@ public class Ore_Blob  implements Entity, Schedulable, AnimatedActor{
     }
     private boolean adjacent(Point p2)
     {
-        return (this.position.x == p2.x && Math.abs(this.position.y - p2.y) == 1) ||
-                (this.position.y == p2.y && Math.abs(this.position.x - p2.x) == 1);
+        return (this.position().x == p2.x && Math.abs(this.position().y - p2.y) == 1) ||
+                (this.position().y == p2.y && Math.abs(this.position().x - p2.x) == 1);
     }
 
 
