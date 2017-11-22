@@ -45,7 +45,7 @@ public class Ore_Blob extends AbstractMoveable{
     public void executeActivity(WorldModel world, ImageStore imageStore, EventScheduler scheduler)
     {
         Optional<Entity> blobTarget = world.findNearest(
-                this.position(), Vein.class);
+                this.position(), new Visitor_Vein());
         long nextPeriod = this.actionPeriod;
 
         if (blobTarget.isPresent())
@@ -106,6 +106,11 @@ public class Ore_Blob extends AbstractMoveable{
     {
         return (this.position().x == p2.x && Math.abs(this.position().y - p2.y) == 1) ||
                 (this.position().y == p2.y && Math.abs(this.position().x - p2.x) == 1);
+    }
+
+    public <R> R accept(EntityVisitor<R> visitor)
+    {
+        return visitor.visit(this);
     }
 
 

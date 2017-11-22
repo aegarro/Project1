@@ -36,7 +36,10 @@ public class Quake extends AbstractAnimation{
 
     }
 
-
+    public <R> R accept(EntityVisitor<R> visitor)
+    {
+        return visitor.visit(this);
+    }
 
 
 }

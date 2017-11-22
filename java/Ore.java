@@ -19,6 +19,10 @@ public class Ore extends AbstractSchedulable{
         this.actionPeriod = actionPeriod;
     }
 
+    public <R> R accept(EntityVisitor<R> visitor)
+    {
+        return visitor.visit(this);
+    }
 
     public void executeActivity(WorldModel world, ImageStore imageStore, EventScheduler scheduler) {
         Point pos = this.position();  // store current position before removing

@@ -12,6 +12,10 @@ public class Blacksmith extends AbstractEntity {
         this.id = id;
 
     }
+    public <R> R accept(EntityVisitor<R> visitor)
+    {
+        return visitor.visit(this);
+    }
 
 
 }

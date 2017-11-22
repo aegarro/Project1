@@ -1,3 +1,4 @@
+import com.sun.tools.javac.code.Attribute;
 import processing.core.PImage;
 
 import java.util.*;
@@ -24,10 +25,10 @@ final class WorldModel
          Arrays.fill(this.background[row], defaultBackground);
       }
    }
+
    public Set<Entity> getEntities() {
        return this.entities;
    }
-
 
    public int getNumRows()
     {
@@ -104,12 +105,12 @@ final class WorldModel
         }
     }
 
-    public Optional<Entity> findNearest(Point pos, Class kind)
+    public Optional<Entity> findNearest(Point pos, EntityVisitor<Boolean> kind)
     {
         List<Entity> ofType = new LinkedList<>();
         for (Entity entity : this.entities)
         {
-            if (kind.isInstance(entity))
+            if (entity.accept(kind))
             {
                 ofType.add(entity);
             }

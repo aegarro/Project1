@@ -7,6 +7,9 @@ public interface Entity {
     public void setPosition(Point position);
     public Point position();
     public PImage getCurrentImage();
+    public <R> R accept(EntityVisitor<R> visitor);
+
+
     //public List<PImage> getImages();
     //ublic int getImageIndex();
     //public int getAnimationPeriod();

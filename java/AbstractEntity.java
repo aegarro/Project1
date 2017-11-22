@@ -36,4 +36,7 @@ public abstract class AbstractEntity implements Entity{
     public void setImageIndex(int i){
         this.imageIndex = i;
     }
+
+    public abstract <R> R accept(EntityVisitor<R> visitor);
+
 }

@@ -63,4 +63,10 @@ public class Vein extends AbstractSchedulable{
 
         return Optional.empty();
     }
+
+    public <R> R accept(EntityVisitor<R> visitor)
+    {
+        return visitor.visit(this);
+    }
+
 }

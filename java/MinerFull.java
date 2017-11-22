@@ -2,11 +2,18 @@ import processing.core.PImage;
 import java.util.Optional;
 
 import java.util.List;
+import java.util.function.BiPredicate;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MinerFull extends AbstractMoveable{
     private String id;
     private int actionPeriod;
     private int resourceLimit;
+    private List<Point> nextPosList;
+
 
     public MinerFull(String id, int resourceLimit,
                      Point position, int actionPeriod, int animationPeriod,
@@ -15,9 +22,10 @@ public class MinerFull extends AbstractMoveable{
         this.id = id;
         this.resourceLimit = resourceLimit;
         this.actionPeriod = actionPeriod;
+        this.nextPosList = null;
     }
 
-    public Point nextPosition(WorldModel world, Point destPos)
+    /*public Point nextPosition(WorldModel world, Point destPos)
     {
         int horiz = Integer.signum(destPos.x - this.position().x);
         Point newPos = new Point(this.position().x + horiz,
@@ -36,6 +44,13 @@ public class MinerFull extends AbstractMoveable{
         }
 
         return newPos;
+    }*/
+
+    public void nextPosition(WorldModel world, Point destPos){
+
+        Predicate<Point> canPassThrough = Point ->  !world.isOccupied(Point);  //check if obstacle here;
+
+        this.nextPosList = this.getStrategy().computePath(this.position(), destPos, canPassThrough, PathingStrategy.withinReach, PathingStrategy.CARDINAL_NEIGHBORS);
     }
 
 
@@ -57,11 +72,18 @@ public class MinerFull extends AbstractMoveable{
     {
         if (this.adjacent(target.position()))
         {
+            //world.moveEntity(this, target.position());
             return true;
         }
         else
         {
-            Point nextPos = this.nextPosition(world, target.position());
+            this.nextPosition(world, target.position());
+
+            if(this.nextPosList.size() == 0){
+                return false;
+            }
+
+            Point nextPos = this.nextPosList.get(0);
 
             if (!this.position().equals(nextPos))
             {
@@ -80,9 +102,9 @@ public class MinerFull extends AbstractMoveable{
     public void executeActivity(WorldModel world, ImageStore imageStore, EventScheduler scheduler)
     {
         Optional<Entity> fullTarget = world.findNearest(this.position(),
-                Blacksmith.class);
-
+                new Visitor_BlackSmith());
         if (fullTarget.isPresent() &&
+                ////
                 this.moveTo(world, fullTarget.get(), scheduler))
         {
             this.transform(world, scheduler, imageStore);
@@ -106,5 +128,8 @@ public class MinerFull extends AbstractMoveable{
         world.addEntity(miner);
         ((Schedulable)miner).scheduleActions(scheduler, world, imageStore);
     }
-
+    public <R> R accept(EntityVisitor<R> visitor)
+    {
+        return visitor.visit(this);
+    }
 }

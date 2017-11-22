@@ -2,12 +2,14 @@ import processing.core.PImage;
 import java.util.Optional;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 public class MinerNotFull extends AbstractMoveable {
     private String id;
     private int actionPeriod;
     private int resourceLimit;
     private int resourceCount;
+    private List<Point> nextPosList;
 
     public MinerNotFull(String id, int resourceLimit, Point position, int actionPeriod,
                               int animationPeriod, List<PImage> images){
@@ -15,28 +17,13 @@ public class MinerNotFull extends AbstractMoveable {
         this.id = id;
         this.resourceLimit = resourceLimit;
         this.actionPeriod = actionPeriod;
+        this.nextPosList = null;
     }
 
+    public void nextPosition(WorldModel world, Point destPos){
 
-    public Point nextPosition(WorldModel world, Point destPos)
-    {
-        int horiz = Integer.signum(destPos.x - this.position().x);
-        Point newPos = new Point(this.position().x + horiz,
-                this.position().y);
-
-        if (horiz == 0 || world.isOccupied(newPos))
-        {
-            int vert = Integer.signum(destPos.y - this.position().y);
-            newPos = new Point(this.position().x,
-                    this.position().y + vert);
-
-            if (vert == 0 || world.isOccupied(newPos))
-            {
-                newPos = this.position();
-            }
-        }
-
-        return newPos;
+        Predicate<Point> canPassThrough = Point ->  !world.isOccupied(Point);  //check if obstacle here;
+        this.nextPosList = this.getStrategy().computePath(this.position(), destPos, canPassThrough, PathingStrategy.withinReach, PathingStrategy.CARDINAL_NEIGHBORS);
     }
 
 
@@ -57,19 +44,27 @@ public class MinerNotFull extends AbstractMoveable {
     public boolean moveTo(WorldModel world, Entity target, EventScheduler scheduler) {
         if (this.adjacent(target.position())) {
             this.resourceCount += 1;
+            EntityVisitor<Boolean> maybe_O = new Visitor_Ore();
+
+            if(target.accept(maybe_O)) {
+                world.moveEntity(this, target.position());
+            }
             world.removeEntity(target);
             scheduler.unscheduleAllEvents(target);
-
             return true;
-        } else {
-            Point nextPos = this.nextPosition(world, target.position());
+        }
 
+        else {
+            nextPosition(world, target.position());
+            if (this.nextPosList.size() == 0){
+                return false;
+            }
+            Point nextPos = this.nextPosList.get(0);
             if (!this.position().equals(nextPos)) {
                 Optional<Entity> occupant = world.getOccupant(nextPos);
                 if (occupant.isPresent()) {
                     scheduler.unscheduleAllEvents(occupant.get());
                 }
-
                 world.moveEntity(this, nextPos);
             }
             return false;
@@ -80,7 +75,7 @@ public class MinerNotFull extends AbstractMoveable {
     public void executeActivity(WorldModel world, ImageStore imageStore, EventScheduler scheduler)
     {
         Optional<Entity> notFullTarget = world.findNearest(this.position(),
-                Ore.class);
+                new Visitor_Ore());
 
         if (!notFullTarget.isPresent() ||
                 !this.moveTo(world, notFullTarget.get(), scheduler) ||
@@ -110,5 +105,10 @@ public class MinerNotFull extends AbstractMoveable {
         }
 
         return false;
+    }
+
+    public <R> R accept(EntityVisitor<R> visitor)
+    {
+        return visitor.visit(this);
     }
 }

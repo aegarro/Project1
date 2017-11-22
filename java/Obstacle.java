@@ -11,4 +11,8 @@ public class Obstacle extends AbstractEntity {
         this.id = id;
     }
 
+    public <R> R accept(EntityVisitor<R> visitor)
+    {
+        return visitor.visit(this);
+    }
 }
