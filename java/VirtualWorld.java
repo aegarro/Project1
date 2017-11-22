@@ -159,8 +159,9 @@ public final class VirtualWorld
    {
       for (Entity entity : world.getEntities())
       {
-         if (entity instanceof Schedulable)
-         {
+         EntityVisitor <Boolean> check_schedulable = new Visitor_Schedulable();
+         if (entity.accept(check_schedulable)){
+
             ((Schedulable)entity).scheduleActions(scheduler, world, imageStore);
          }
       }
