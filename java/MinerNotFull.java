@@ -44,9 +44,9 @@ public class MinerNotFull extends AbstractMoveable {
     public boolean moveTo(WorldModel world, Entity target, EventScheduler scheduler) {
         if (this.adjacent(target.position())) {
             this.resourceCount += 1;
-            EntityVisitor<Boolean> maybe_O = new Visitor_Ore();
+            EntityVisitor<Boolean> check_O = new Visitor_Ore();
 
-            if(target.accept(maybe_O)) {
+            if(target.accept(check_O)) {
                 world.moveEntity(this, target.position());
             }
             world.removeEntity(target);
@@ -56,9 +56,11 @@ public class MinerNotFull extends AbstractMoveable {
 
         else {
             nextPosition(world, target.position());
-            if (this.nextPosList.size() == 0){
+
+            if (this.nextPosList== null){
                 return false;
             }
+
             Point nextPos = this.nextPosList.get(0);
             if (!this.position().equals(nextPos)) {
                 Optional<Entity> occupant = world.getOccupant(nextPos);

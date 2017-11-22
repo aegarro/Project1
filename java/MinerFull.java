@@ -104,7 +104,6 @@ public class MinerFull extends AbstractMoveable{
         Optional<Entity> fullTarget = world.findNearest(this.position(),
                 new Visitor_BlackSmith());
         if (fullTarget.isPresent() &&
-                ////
                 this.moveTo(world, fullTarget.get(), scheduler))
         {
             this.transform(world, scheduler, imageStore);

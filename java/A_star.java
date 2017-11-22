@@ -15,7 +15,8 @@ class A_star implements PathingStrategy{
                             Function<Point, Stream<Point>> potentialNeighbors) {
 
         List<Location> OpenList = new ArrayList<>();
-        List<Location> other_OpenList = new ArrayList<>();
+        List<Location> other_OpenList;
+        Location lowest_f = null;
 
         List<Location> ClosedList = new ArrayList<>();
         List<Point> result = null;
@@ -27,7 +28,7 @@ class A_star implements PathingStrategy{
         OpenList.add(firstP);
         int g = 1;
 
-        while (!currentP.get_currentP().equals(end)) {
+        while (!OpenList.isEmpty()) {
             List<Point> around =
                     potentialNeighbors.apply(currentP.get_currentP()) //get Neighbors surrounding current point
                             .filter(canPassThrough)
@@ -45,6 +46,7 @@ class A_star implements PathingStrategy{
                     if (withinReach.test(p, end)) {       //check if next to the goal
                         result = new ArrayList<>();
                         if (start.equals(prior)){
+                            result.add(p);
                             result.add(end);
                             return result;
                         }
@@ -69,9 +71,7 @@ class A_star implements PathingStrategy{
                         Collections.reverse(result);
                         result.add(end);
                         result.remove(0);
-                        if (result.isEmpty()){
-                            result = null;
-                        }
+
 
                         return result;
                     }
@@ -107,7 +107,7 @@ class A_star implements PathingStrategy{
             }
 
             //find next position to put on close list
-            Location lowest_f = null;
+            lowest_f = null;
             for (Location find_next : OpenList) {
                 if (find_next != null) {
                     if (lowest_f == null) {
