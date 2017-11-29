@@ -44,6 +44,25 @@ public class MinerFull extends AbstractMoveable{
         }
 
         return newPos;
+
+        Optional<Entity> occupant = world.getOccupant(newPos);
+
+        if (horiz == 0 ||
+                (occupant.isPresent() && !((occupant.get()) instanceof Ore)))
+        {
+            int vert = Integer.signum(destPos.y - position().y);
+            newPos = new Point(position().x, position().y + vert);
+            occupant = world.getOccupant(newPos);
+
+            if (vert == 0 ||
+                    (occupant.isPresent() && !((occupant.get()) instanceof Ore)))
+            {
+                newPos = position();
+            }
+        }
+
+        return newPos;
+    }
     }*/
 
     public void nextPosition(WorldModel world, Point destPos){
@@ -79,7 +98,7 @@ public class MinerFull extends AbstractMoveable{
         {
             this.nextPosition(world, target.position());
 
-            if(this.nextPosList.size() == 0){
+            if(this.nextPosList == null){
                 return false;
             }
 

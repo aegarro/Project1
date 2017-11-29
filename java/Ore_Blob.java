@@ -1,11 +1,14 @@
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.Predicate;
 
 import processing.core.PImage;
 public class Ore_Blob extends AbstractMoveable{
     private String id;
     private int actionPeriod;
+    private List<Point> nextPosList;
+
 
 
     public Ore_Blob(String id, Point position, List<PImage> images, int actionPeriod, int animationPeriod)
@@ -13,11 +16,19 @@ public class Ore_Blob extends AbstractMoveable{
         super(position, images, 0, animationPeriod);
         this.id = id;
         this.actionPeriod = actionPeriod;
+        this.nextPosList = null;
     }
 
+    /*public void nextPosition(WorldModel world, Point destPos){
 
+        Predicate<Point> canPassThrough = Point ->  !world.isOccupied(Point);  //check if obstacle here;
+
+        this.nextPosList = this.getStrategy().computePath(this.position(), destPos, canPassThrough, PathingStrategy.withinReach, PathingStrategy.CARDINAL_NEIGHBORS);
+    }
+    */
     public Point nextPosition(WorldModel world, Point destPos)
     {
+        EntityVisitor<Boolean> check_O = new Visitor_Ore();
         int horiz = Integer.signum(destPos.x - position().x);
         Point newPos = new Point(position().x + horiz,
                 position().y);
@@ -25,14 +36,14 @@ public class Ore_Blob extends AbstractMoveable{
         Optional<Entity> occupant = world.getOccupant(newPos);
 
         if (horiz == 0 ||
-                (occupant.isPresent() && !((occupant.get()) instanceof Ore)))
+                (occupant.isPresent() && !(occupant.get()).accept(check_O)))
         {
             int vert = Integer.signum(destPos.y - position().y);
             newPos = new Point(position().x, position().y + vert);
             occupant = world.getOccupant(newPos);
 
             if (vert == 0 ||
-                    (occupant.isPresent() && !((occupant.get()) instanceof Ore)))
+                    (occupant.isPresent() && !((occupant.get()).accept(check_O))))
             {
                 newPos = position();
             }
