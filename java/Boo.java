@@ -94,7 +94,6 @@ public class Boo extends AbstractMoveable{
             //if (!this.position().equals(nextPos))
             //{
                 Entity e = world.getEntityOccupant(nextPos);
-                System.out.println(this.position() +", " + target.position());
 
 
                 Optional<Entity> occupant = world.getOccupant(nextPos);
@@ -135,7 +134,6 @@ public class Boo extends AbstractMoveable{
                             this.actionPeriod);
                     return false;
                 }
-                System.out.println("Next POS " + nextPos);
                 world.moveEntity(this, nextPos);
                 //setPosition(nextPos);
             }

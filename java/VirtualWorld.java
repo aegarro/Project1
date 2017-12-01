@@ -285,29 +285,45 @@ public final class VirtualWorld
       }
       else
       {
-         Entity one = null;
+         Entity one;
+         int one_d;
          Entity two = null;
+         int two_d=20;
          Entity three = null;
+         int three_d=20;
+
+         int size = 1;
 
          List<Entity> nearestEntity = new LinkedList<>();
          Entity nearest = entities.get(0);
          entities.remove(0);
          one = nearest;
          int nearestDistance = world.distanceSquared(nearest.position(),pos);
+         one_d = nearestDistance;
 
-         for (Entity other : entities)
-         {
-
+         for (Entity other : entities) {
+            size += 1;
             int otherDistance = world.distanceSquared(other.position(), pos);
 
-            if (otherDistance < nearestDistance)
-            {
-               nearest = other;
+            if (otherDistance < one_d) {
+               if (size >= 3) {
+                  three_d = two_d;
+               }
+               two_d = one_d;
+               one_d = otherDistance;
                three = two;
                two = one;
-               one = nearest;
-
-               nearestDistance = otherDistance;
+               one = other;
+            } else if (otherDistance < two_d) {
+               if (size >= 3) {
+                  three_d = two_d;
+               }
+               two_d = otherDistance;
+               three = two;
+               two = other;
+            } else if (otherDistance < three_d) {
+               three = other;
+               three_d = otherDistance;
             }
          }
          nearestEntity.add(one);
