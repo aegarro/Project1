@@ -288,9 +288,9 @@ public final class VirtualWorld
          Entity one;
          int one_d;
          Entity two = null;
-         int two_d=20;
+         int two_d=200;
          Entity three = null;
-         int three_d=20;
+         int three_d=200;
 
          int size = 1;
 
