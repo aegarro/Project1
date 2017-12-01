@@ -213,7 +213,7 @@ final class WorldModel
             return Optional.of(nearest);
         }
     }
-    private int distanceSquared(Point p1, Point p2)
+    public static int distanceSquared(Point p1, Point p2)
     {
         int deltaX = p1.x - p2.x;
         int deltaY = p1.y - p2.y;

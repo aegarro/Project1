@@ -169,30 +169,31 @@ public final class VirtualWorld
             world.setBackground(i, b);
          }
          clicks = 1;
-      }
 
 
-      //EntityVisitor<Boolean> kind = new Visitor_BlackSmith();
-      EntityVisitor<Boolean> miner = new Visitor_Miner();
-      EntityVisitor<Boolean> monstr = new Visitor_Monster();
-      num_mon =0;
-      List<Entity> list_mons = check_Entity(tile, monstr, world);
+         //EntityVisitor<Boolean> kind = new Visitor_BlackSmith();
+         EntityVisitor<Boolean> miner = new Visitor_Miner();
+         //EntityVisitor<Boolean> monstr = new Visitor_Monster();
+         //num_mon =0;
+         //List<Entity> list_mons = check_Entity(tile, monstr, world);
 
-      if(list_mons != null){
+      /*if(list_mons != null){
          for (Entity m : list_mons) {
             num_mon += 1;
          }
       }
-      if (num_mon < 3) {
+      if (num_mon < 3) {*/
          List<Entity> list_M = check_Entity(tile, miner, world);
          if (list_M != null) {
             for (Entity m : list_M) {
-               Point entity_p = m.position();
-               world.removeEntity(m);
-               scheduler.unscheduleAllEvents(m);
-               Entity mon = Create.createMonster(M_ID, 4, entity_p, 992, 100, imageStore.getImageList("monster"));
-               world.tryAddEntity(mon);
-               ((Schedulable) mon).scheduleActions(scheduler, world, this.imageStore);
+               if (m != null) {
+                  Point entity_p = m.position();
+                  world.removeEntity(m);
+                  scheduler.unscheduleAllEvents(m);
+                  Entity mon = Create.createMonster(M_ID, 4, entity_p, 992, 100, imageStore.getImageList("monster"));
+                  world.tryAddEntity(mon);
+                  ((Schedulable) mon).scheduleActions(scheduler, world, this.imageStore);
+               }
             }
          }
       }
@@ -239,7 +240,7 @@ public final class VirtualWorld
                ofType.add(entity);
             }
          }
-         return nearestEntity(ofType, pos);
+         return closestEntity(ofType, pos);
    }
 
    public static List<Entity> entity_List(Point pos, EntityVisitor<Boolean> kind, WorldModel world) {
@@ -255,7 +256,7 @@ public final class VirtualWorld
       return ofType;
    }
 
-   private List<Entity> nearestEntity(List<Entity> entities, Point pos)
+   /*private List<Entity> nearestEntity(List<Entity> entities, Point pos)
    {
       ArrayList<Entity> result = new ArrayList<>();
       if (entities.isEmpty())
@@ -274,8 +275,47 @@ public final class VirtualWorld
 
          return result;
       }
-   }
+   }*/
+   private List<Entity> closestEntity(List<Entity> entities,
+                                          Point pos)
+   {
+      if (entities.isEmpty())
+      {
+         return null;
+      }
+      else
+      {
+         Entity one = null;
+         Entity two = null;
+         Entity three = null;
 
+         List<Entity> nearestEntity = new LinkedList<>();
+         Entity nearest = entities.get(0);
+         entities.remove(0);
+         one = nearest;
+         int nearestDistance = world.distanceSquared(nearest.position(),pos);
+
+         for (Entity other : entities)
+         {
+
+            int otherDistance = world.distanceSquared(other.position(), pos);
+
+            if (otherDistance < nearestDistance)
+            {
+               nearest = other;
+               three = two;
+               two = one;
+               one = nearest;
+
+               nearestDistance = otherDistance;
+            }
+         }
+         nearestEntity.add(one);
+         nearestEntity.add(two);
+         nearestEntity.add(three);
+         return nearestEntity;
+      }
+   }
 
 
    private static Background createDefaultBackground(ImageStore imageStore)

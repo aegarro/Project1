@@ -1,6 +1,7 @@
 import processing.core.PImage;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -10,6 +11,8 @@ public class Monster extends AbstractMoveable{
     private int actionPeriod;
     private int resourceLimit;
     private List<Point> nextPosList;
+    private ImageStore image;
+
 
 
     public Monster(String id, int resourceLimit,
@@ -20,6 +23,8 @@ public class Monster extends AbstractMoveable{
         this.resourceLimit = resourceLimit;
         this.actionPeriod = actionPeriod;
         this.nextPosList = null;
+        this.image = null;
+
     }
 
     public void nextPosition(WorldModel world, Point destPos){
@@ -48,11 +53,32 @@ public class Monster extends AbstractMoveable{
     {
         if (this.adjacent(target.position()))
         {
-            EntityVisitor<Boolean> check_b = new Visitor_Boo();
-            if(target.accept(check_b)) {
-                world.moveEntity(this, target.position());
-                world.removeEntity(target);
-                scheduler.unscheduleAllEvents(target);
+            EntityVisitor<Boolean> check_bdb = new Visitor_MonsterTarget();
+            EntityVisitor<Boolean> check_boulder = new Visitor_Boulder();
+
+            if(target.accept(check_bdb)) {
+                //know its door or boo
+
+                EntityVisitor<Boolean> d = new Visitor_Door();
+                if(target.accept(d)){
+                    Point d_Pos = target.position();
+                    scheduler.unscheduleAllEvents(target);
+                    world.removeEntity(target);
+                    Entity b = Create.createBlacksmith("blacksmith", d_Pos, this.image.getImageList("blacksmith"));
+                    world.addEntity(b);
+                }
+                else if(target.accept(check_boulder)) {
+                    Point d_Pos = target.position();
+                    scheduler.unscheduleAllEvents(target);
+                    world.removeEntity(target);
+                    Entity b = Create.createBlacksmith("ore", d_Pos, this.image.getImageList("ore"));
+                    world.addEntity(b);
+                }
+                else {
+                    world.moveEntity(this, target.position());
+                    world.removeEntity(target);
+                    scheduler.unscheduleAllEvents(target);
+                }
             }
             return true;
         }
@@ -89,14 +115,15 @@ public class Monster extends AbstractMoveable{
 
     public void executeActivity(WorldModel world, ImageStore imageStore, EventScheduler scheduler)
     {
+        this.image = imageStore;
         Optional<Entity> fullTarget = world.findNearest(this.position(),
-                new Visitor_Boo());
+                new Visitor_MonsterTarget());
 
         if (fullTarget.isPresent() &&
                 this.moveTo(world, fullTarget.get(), scheduler))
         {
-            EntityVisitor<Boolean> boo_v = new Visitor_Boo();
-            List<Entity> list_boo = VirtualWorld.entity_List(position(), boo_v, world);
+            EntityVisitor<Boolean> mon_Tar = new Visitor_MonsterTarget();
+            List<Entity> list_boo = VirtualWorld.entity_List(position(), mon_Tar, world);
             int num_boo =0;
             if(list_boo != null) {
                 for (Entity b : list_boo) {
@@ -106,12 +133,15 @@ public class Monster extends AbstractMoveable{
             if(num_boo==0) {
                 this.transform(world, scheduler, imageStore);
                 EntityVisitor<Boolean> this_Monster = new Visitor_Monster();
-                List<Entity> list_mon = VirtualWorld.entity_List(position(), boo_v, world);
+                List<Entity> list_mon = VirtualWorld.entity_List(position(), this_Monster, world);
                 if(list_mon != null) {
                     for (Entity b : list_mon) {
                         ((Monster)b).transform(world,scheduler,imageStore);
                     }
                 }
+            }
+            else{
+                scheduler.scheduleEvent(this, ActionFactory.createActivityAction(this, world, imageStore), this.actionPeriod);
             }
         }
         else
