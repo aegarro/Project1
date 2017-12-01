@@ -381,6 +381,20 @@ public final class VirtualWorld
       }
    }
 
+   public static void loadGrass(WorldModel world, String filename,
+                                 ImageStore imageStore)
+   {
+      try
+      {
+         Scanner in = new Scanner(new File(filename));
+         WorldLoader.load_Grass(in, world, imageStore);
+      }
+      catch (FileNotFoundException e)
+      {
+         System.err.println(e.getMessage());
+      }
+   }
+
    private static void scheduleActions(WorldModel world,
       EventScheduler scheduler, ImageStore imageStore)
    {

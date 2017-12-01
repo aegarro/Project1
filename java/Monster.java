@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 public class Monster extends AbstractMoveable{
+    private static final String LOAD_FILE_NAME = "gaia.sav";
     private String id;
     private int actionPeriod;
     private int resourceLimit;
@@ -154,6 +155,7 @@ public class Monster extends AbstractMoveable{
 
     private void transform(WorldModel world, EventScheduler scheduler, ImageStore imageStore)
     {
+        VirtualWorld.loadGrass(world, LOAD_FILE_NAME, imageStore);
         Entity Miner = Create.createMinerNotFull(this.id, this.resourceLimit,
                 this.position(), this.actionPeriod, this.getAnimationPeriod(),
                 imageStore.getImageList("miner"));

@@ -78,6 +78,47 @@ public class WorldLoader {
         }
     }
 
+    public static void load_Grass(Scanner in, WorldModel world, ImageStore imageStore)
+    {
+        int lineNumber = 0;
+        while (in.hasNextLine())
+        {
+            try
+            {
+                if (!processLineGrass(in.nextLine(), world, imageStore))
+                {
+                    System.err.println(String.format("invalid entry on line %d",
+                            lineNumber));
+                }
+            }
+            catch (NumberFormatException e)
+            {
+                System.err.println(String.format("invalid entry on line %d",
+                        lineNumber));
+            }
+            catch (IllegalArgumentException e)
+            {
+                System.err.println(String.format("issue on line %d: %s",
+                        lineNumber, e.getMessage()));
+            }
+            lineNumber++;
+        }
+    }
+    private static boolean processLineGrass(String line, WorldModel world,
+                                       ImageStore imageStore)
+    {
+        String[] properties = line.split("\\s");
+        if (properties.length > 0)
+        {
+            switch (properties[PROPERTY_KEY]) {
+                case BGND_KEY:
+                    return parseBackground(properties, world, imageStore);
+            }
+        }
+
+        return true;
+    }
+
     private static boolean processLine(String line, WorldModel world,
                                        ImageStore imageStore)
     {
