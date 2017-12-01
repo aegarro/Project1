@@ -53,7 +53,34 @@ public class Create {
     }
 
 
+    public static Entity createMonster(String id, int resourceLimit,
+                                            Point position, int actionPeriod, int animationPeriod,
+                                            List<PImage> images)
+    {
+        return new Monster("Monster", resourceLimit, position, actionPeriod, animationPeriod, images);
+    }
 
+    public static Entity createSpace(String id, Point position,
+                                        List<PImage> images)
+    {
+        return new Space("space", position, images);
+    }
 
+    public static Entity createBoulder(String id, Point position,
+                                     List<PImage> images)
+    {
+        return new Boulder("boulder", position, images);
+    }
 
+    public static Entity createDoor(String id, Point position,
+                                          List<PImage> images)
+    {
+        return new Door("door", position, images);
+    }
+    public static Entity createBoo(String id,
+                                       Point position, int actionPeriod, int animationPeriod,
+                                       List<PImage> images)
+    {
+        return new Boo("boo", position, actionPeriod, animationPeriod, images);
+    }
 }

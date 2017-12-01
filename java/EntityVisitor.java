@@ -7,6 +7,14 @@ public interface EntityVisitor<R> {
     R visit(MinerNotFull miner);
     R visit(Blacksmith blacksmith);
     R visit(Obstacle obstacle);
+    R visit(Monster monster);
+    R visit(Boo boo);
+    R visit(Space space);
+    R visit(Door door);
+    R visit(Boulder door);
+
+
+
 
 
 }

@@ -47,6 +47,8 @@ public class WorldLoader {
     public static final String SMITH_KEY = "blacksmith";
     public static final String QUAKE_KEY = "quake";
     public static final String BGND_KEY = "background";
+    public static final String MONSTER_KEY = "monster";
+    public static final String SPACE_KEY = "space";
 
 
     public static void load(Scanner in, WorldModel world, ImageStore imageStore)
@@ -82,8 +84,7 @@ public class WorldLoader {
         String[] properties = line.split("\\s");
         if (properties.length > 0)
         {
-            switch (properties[PROPERTY_KEY])
-            {
+            switch (properties[PROPERTY_KEY]) {
                 case BGND_KEY:
                     return parseBackground(properties, world, imageStore);
                 case MINER_KEY:
@@ -96,6 +97,10 @@ public class WorldLoader {
                     return parseSmith(properties, world, imageStore);
                 case VEIN_KEY:
                     return parseVein(properties, world, imageStore);
+                case MONSTER_KEY:
+                    return parseMonster(properties, world, imageStore);
+                case SPACE_KEY:
+                    return parseSpace(properties, world, imageStore);
             }
         }
 
@@ -134,6 +139,24 @@ public class WorldLoader {
         return properties.length == MINER_NUM_PROPERTIES;
     }
 
+    private static boolean parseMonster(String [] properties, WorldModel world, ImageStore imageStore)
+    {
+        if (properties.length == MINER_NUM_PROPERTIES)
+        {
+            Point pt = new Point(Integer.parseInt(properties[MINER_COL]),
+                    Integer.parseInt(properties[MINER_ROW]));
+            Entity entity = Create.createMinerNotFull(properties[MINER_ID],
+                    Integer.parseInt(properties[MINER_LIMIT]),
+                    pt,
+                    Integer.parseInt(properties[MINER_ACTION_PERIOD]),
+                    Integer.parseInt(properties[MINER_ANIMATION_PERIOD]),
+                    imageStore.getImageList(MONSTER_KEY));
+            world.tryAddEntity(entity);
+        }
+
+        return properties.length == MINER_NUM_PROPERTIES;
+    }
+
     private static boolean parseObstacle(String [] properties, WorldModel world, ImageStore imageStore)
     {
         if (properties.length == OBSTACLE_NUM_PROPERTIES)
@@ -148,6 +171,23 @@ public class WorldLoader {
 
         return properties.length == OBSTACLE_NUM_PROPERTIES;
     }
+
+
+    private static boolean parseSpace(String [] properties, WorldModel world, ImageStore imageStore)
+    {
+        if (properties.length == OBSTACLE_NUM_PROPERTIES)
+        {
+            Point pt = new Point(
+                    Integer.parseInt(properties[OBSTACLE_COL]),
+                    Integer.parseInt(properties[OBSTACLE_ROW]));
+            Entity entity = Create.createSpace(properties[OBSTACLE_ID],
+                    pt, imageStore.getImageList(SPACE_KEY));
+            world.tryAddEntity(entity);
+        }
+
+        return properties.length == OBSTACLE_NUM_PROPERTIES;
+    }
+
 
     private static boolean parseOre(String [] properties, WorldModel world, ImageStore imageStore)
     {
@@ -171,6 +211,7 @@ public class WorldLoader {
         {
             Point pt = new Point(Integer.parseInt(properties[SMITH_COL]),
                     Integer.parseInt(properties[SMITH_ROW]));
+            //id position images
             Entity entity = Create.createBlacksmith(properties[SMITH_ID],
                     pt, imageStore.getImageList(SMITH_KEY));
             //SMITH_KEY

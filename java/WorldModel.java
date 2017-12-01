@@ -62,6 +62,15 @@ final class WorldModel
          return Optional.empty();
       }
    }
+    public Entity getEntityOccupant(Point pos)
+    {
+        if (this.isOccupied(pos))
+        {
+            return this.getOccupancyCell(pos);
+        }
+        return null;
+    }
+
    private Entity getOccupancyCell(Point pos)
    {
       return this.occupancy[pos.y][pos.x];
@@ -105,19 +114,6 @@ final class WorldModel
         }
     }
 
-    public Optional<Entity> findNearest(Point pos, EntityVisitor<Boolean> kind)
-    {
-        List<Entity> ofType = new LinkedList<>();
-        for (Entity entity : this.entities)
-        {
-            if (entity.accept(kind))
-            {
-                ofType.add(entity);
-            }
-        }
-
-        return nearestEntity(ofType, pos);
-    }
 
     /*
        Assumes that there is no entity currently occupying the
@@ -138,7 +134,8 @@ final class WorldModel
         {
             // arguably the wrong type of exception, but we are not
             // defining our own exceptions yet
-            throw new IllegalArgumentException("position occupied");
+            //throw new IllegalArgumentException("position occupied");
+
         }
 
         this.addEntity(entity);
@@ -174,6 +171,20 @@ final class WorldModel
         this.removeEntityAt(entity.position());
     }
 
+
+    public Optional<Entity> findNearest(Point pos, EntityVisitor<Boolean> kind)
+    {
+        List<Entity> ofType = new LinkedList<>();
+        for (Entity entity : this.entities)
+        {
+            if (entity.accept(kind))
+            {
+                ofType.add(entity);
+            }
+        }
+
+        return nearestEntity(ofType, pos);
+    }
 
 
     private Optional<Entity> nearestEntity(List<Entity> entities,

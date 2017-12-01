@@ -1,12 +1,23 @@
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Scanner;
+import java.util.*;
+
 import processing.core.*;
 
 public final class VirtualWorld
    extends PApplet
 {
    private static final int TIMER_ACTION_PERIOD = 100;
+   private static Point tile_tracker = new Point(0,0);
+   //20 15 down
+
+   private static int M_ID_tracker = 1;
+   private static int S_ID_tracker = 1;
+   private static int B_ID_tracker = 1;
+   private static int clicks = 0;
+   private static int num_mon = 0;
+
 
    private static final int VIEW_WIDTH = 640;
    private static final int VIEW_HEIGHT = 480;
@@ -103,9 +114,169 @@ public final class VirtualWorld
                dx = 1;
                break;
          }
+         tile_tracker.x += Point.check_bounds(tile_tracker,dx,dy).x;
+         tile_tracker.y += Point.check_bounds(tile_tracker,dx,dy).y;
          view.shiftView(dx, dy);
       }
    }
+
+   public void mouseClicked() {
+      Point tile = new Point(mouseX / 32 + tile_tracker.x, tile_tracker.y + mouseY / 32);
+
+      String M_ID = "monster" + M_ID_tracker;
+      String S_ID = "space" + S_ID_tracker;
+
+      EntityVisitor<Boolean> boo_v = new Visitor_Boo();
+      List<Entity> list_boo = entity_List(tile, boo_v, world);
+      int num_boo =0;
+      if(list_boo != null) {
+         for (Entity b : list_boo) {
+            num_boo += 1;
+         }
+      }
+
+      if (num_boo == 0) {
+         String B_ID = "boo" + B_ID_tracker;
+         Entity boo = Create.createBoo(M_ID, tile, 992, 100, imageStore.getImageList("boo"));
+         ((Schedulable) boo).scheduleActions(scheduler, world, this.imageStore);
+         world.addEntity(boo);
+      /*Entity monster = Create.createMonster(M_ID, 3, tile, 992, 100, imageStore.getImageList("monster"));
+      world.tryAddEntity(monster);
+      //not check 4 sides for
+      ((Schedulable)monster).scheduleActions(scheduler, world, this.imageStore);
+      M_ID_tracker +=1;
+      S_ID_tracker +=1;*/
+
+         List<Point> around = new LinkedList<>();
+         around.add(tile);
+         around.add(new Point(tile.x + 1, tile.y));
+         around.add(new Point(tile.x - 1, tile.y));
+         around.add(new Point(tile.x, tile.y + 1));
+         around.add(new Point(tile.x, tile.y - 1));
+         around.add(new Point(tile.x + 1, tile.y + 1));
+         around.add(new Point(tile.x + 1, tile.y - 1));
+         around.add(new Point(tile.x - 1, tile.y - 1));
+         around.add(new Point(tile.x - 1, tile.y + 1));
+
+         Background b = new Background("space", imageStore.getImageList("space"));
+         int check = 0;
+         for (Point i : around) {
+            if (check == 0 & !world.isOccupied(i)) {
+               Entity door = Create.createDoor("door", i, imageStore.getImageList("door"));
+               world.addEntity(door);
+               check = 1;
+            }
+            world.setBackground(i, b);
+         }
+         clicks = 1;
+      }
+
+
+      //EntityVisitor<Boolean> kind = new Visitor_BlackSmith();
+      EntityVisitor<Boolean> miner = new Visitor_Miner();
+      EntityVisitor<Boolean> monstr = new Visitor_Monster();
+      num_mon =0;
+      List<Entity> list_mons = check_Entity(tile, monstr, world);
+
+      if(list_mons != null){
+         for (Entity m : list_mons) {
+            num_mon += 1;
+         }
+      }
+      if (num_mon < 3) {
+         List<Entity> list_M = check_Entity(tile, miner, world);
+         if (list_M != null) {
+            for (Entity m : list_M) {
+               Point entity_p = m.position();
+               world.removeEntity(m);
+               scheduler.unscheduleAllEvents(m);
+               Entity mon = Create.createMonster(M_ID, 4, entity_p, 992, 100, imageStore.getImageList("monster"));
+               world.tryAddEntity(mon);
+               ((Schedulable) mon).scheduleActions(scheduler, world, this.imageStore);
+            }
+         }
+      }
+   }
+
+
+      /*List<Entity> list_B = check_Entity(tile, kind, world);
+      if (list_B != null){
+         for(Entity black_S : list_B) {
+            Point entity_p = black_S.position();
+            world.removeEntity(black_S);
+            scheduler.unscheduleAllEvents(black_S);
+            Entity door = Create.createDoor(S_ID, entity_p, imageStore.getImageList("door"));
+            world.tryAddEntity(door);
+         }
+      }*/
+
+      /*EntityVisitor<Boolean> obs = new Visitor_Obstacle();
+      List<Entity> list_O = check_Entity(tile, kind, world);
+      if (list_B != null){
+         for(Entity ob : list_O) {
+            Point entity_p = ob.position();
+            world.removeEntity(ob);
+            scheduler.unscheduleAllEvents(ob);
+            Entity space_ob = Create.createSpace_ob(S_ID, entity_p, imageStore.getImageList("space"));
+            world.tryAddEntity(space_ob);
+         }
+      }*/
+
+
+   public ImageStore get_imageStore(){
+      return this.imageStore;
+   }
+
+   public List<Entity> check_Entity(Point pos, EntityVisitor<Boolean> kind, WorldModel world)
+      {
+
+         List<Entity> ofType = new LinkedList<>();
+         for (Entity entity : world.getEntities())
+         {
+            if (entity.accept(kind))
+            //if(kind.visit(entity))
+            {
+               ofType.add(entity);
+            }
+         }
+         return nearestEntity(ofType, pos);
+   }
+
+   public static List<Entity> entity_List(Point pos, EntityVisitor<Boolean> kind, WorldModel world) {
+
+      List<Entity> ofType = new LinkedList<>();
+      for (Entity entity : world.getEntities()) {
+         if (entity.accept(kind))
+         //if(kind.visit(entity))
+         {
+            ofType.add(entity);
+         }
+      }
+      return ofType;
+   }
+
+   private List<Entity> nearestEntity(List<Entity> entities, Point pos)
+   {
+      ArrayList<Entity> result = new ArrayList<>();
+      if (entities.isEmpty())
+      {
+         return null;
+      }
+      else
+      {
+         for (Entity other : entities)
+         {
+            if(Math.abs(other.position().x - pos.x) < 2 & Math.abs(other.position().y - pos.y) <2){
+               result.add(other);
+
+            }
+         }
+
+         return result;
+      }
+   }
+
+
 
    private static Background createDefaultBackground(ImageStore imageStore)
    {

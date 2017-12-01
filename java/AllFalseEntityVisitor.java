@@ -31,4 +31,24 @@ public class AllFalseEntityVisitor implements EntityVisitor {
         return false;
     }
 
+    public Boolean visit(Monster monster) {
+        return false;
+    }
+
+    public Boolean visit(Boo boo) {
+        return false;
+    }
+    public Boolean visit(Space space) {
+        return false;
+    }
+    public Boolean visit(Boulder b) {
+        return false;
+    }
+    public Boolean visit(Door door) {
+        return false;
+    }
+
+
+
 }
+
